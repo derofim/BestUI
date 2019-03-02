@@ -4,6 +4,8 @@ ScrollView::ScrollView()
 {
 	SetPosition(0, 0);
 	SetSize(0, 0);
+	nDirectionType = Direction::Vertical;
+	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
 }
 
 void ScrollView::Draw(SkCanvas* canvas)
@@ -12,7 +14,14 @@ void ScrollView::Draw(SkCanvas* canvas)
 	SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
 	auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
     auto surfaceCanvas = gpuSurface->getCanvas();
-	SkScalar x = 0, y = -900;
+	SkScalar x = 0, y = 0;
+
+	ContentInfo.offs += 0.1;
+	if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+	{
+		ContentInfo.offs = 0;
+	}
+	y = ContentInfo.offs;
 	for (auto iter = imagelist.begin(); iter != imagelist.end(); iter++)
 	{
 		surfaceCanvas->drawImage((*iter).get(), x, y, 0);
@@ -31,6 +40,25 @@ void  ScrollView::OnMouseDown(int x, int y)
 {
 }
 
+void ScrollView::SetDirection(Direction nType)
+{
+	nDirectionType = nType;
+}
+
+void ScrollView::JumpTop()
+{
+}
+void ScrollView::JumpBottom()
+{
+}
+
+void ScrollView::JumpLeft()
+{
+}
+void ScrollView::JumpRight()
+{
+}
+
 
 void  ScrollView::AddChild(char *pImagePath)
 {
@@ -39,6 +67,17 @@ void  ScrollView::AddChild(char *pImagePath)
 	if (blob == NULL) return;
 	sk_sp<SkImage> image = SkImage::MakeFromEncoded(blob);
 	imagelist.push_back(image);
+	if (nDirectionType == Direction::Vertical)
+	{
+		ContentInfo.height += image->height();
+		ContentInfo.width = GetWidth();
+	}
+	else if (nDirectionType == Direction::Horizontal)
+	{
+		ContentInfo.width += image->width();
+		ContentInfo.height = GetHeight();
+	}
+
 	//sk_sp<SkSurface> surface =  SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info, 0, &props) : SkSurface::MakeRaster(info, &props);
 
 

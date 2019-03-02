@@ -13,8 +13,19 @@
 
 //SkSurface
 
+struct ScrollContentInfo {
+	SkScalar width;
+	SkScalar height;
+	SkScalar offs;
+};
+
 class ScrollView :public UIWidget {
 public:
+
+	enum Direction {
+		Vertical,
+		Horizontal
+	};
 	ScrollView();
 
 	void Draw(SkCanvas* canvas) override;
@@ -23,7 +34,18 @@ public:
 
 	void AddChild(char *pImagePath);
 
+	void JumpTop();
+	void JumpBottom();
+	void JumpLeft();
+	void JumpRight();
+
+	void SetDirection(Direction nType);
+	
+
 private:
 	std::vector<sk_sp<SkImage>> imagelist;
-	SkScalar offs;
+	/*SkScalar offs;
+	SkScalar hei;*/
+	Direction nDirectionType;
+	ScrollContentInfo ContentInfo;
 };
