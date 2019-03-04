@@ -1,11 +1,12 @@
 #include "ScrollView.h"
 
-ScrollView::ScrollView()
+ScrollView::ScrollView(UIRoot *pUi)
 {
 	SetPosition(0, 0);
 	SetSize(0, 0);
 	nDirectionType = Direction::Vertical;
 	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
+	pUIRoot = pUi;
 }
 
 void ScrollView::Draw(SkCanvas* canvas)
@@ -16,11 +17,11 @@ void ScrollView::Draw(SkCanvas* canvas)
     auto surfaceCanvas = gpuSurface->getCanvas();
 	SkScalar x = 0, y = 0;
 
-	ContentInfo.offs += 0.1;
+	/*ContentInfo.offs += 0.1;
 	if (ContentInfo.offs >= ContentInfo.height - GetHeight())
 	{
 		ContentInfo.offs = 0;
-	}
+	}*/
 	y = ContentInfo.offs;
 	for (auto iter = imagelist.begin(); iter != imagelist.end(); iter++)
 	{
@@ -47,9 +48,13 @@ void ScrollView::SetDirection(Direction nType)
 
 void ScrollView::JumpTop()
 {
+	if (nDirectionType == Direction::Vertical)
+		ContentInfo.offs = 0;
 }
 void ScrollView::JumpBottom()
 {
+	if (nDirectionType == Direction::Vertical)
+		ContentInfo.offs = -(ContentInfo.height - GetHeight());
 }
 
 void ScrollView::JumpLeft()
@@ -60,6 +65,13 @@ void ScrollView::JumpRight()
 }
 
 
+void ScrollView::AddChild(UIWidget *pWidget)
+{
+	//pWidget->add
+//	pUIRoot->AddWidget(pWidget);
+}
+
+
 void  ScrollView::AddChild(char *pImagePath)
 {
 
@@ -67,6 +79,7 @@ void  ScrollView::AddChild(char *pImagePath)
 	if (blob == NULL) return;
 	sk_sp<SkImage> image = SkImage::MakeFromEncoded(blob);
 	imagelist.push_back(image);
+
 	if (nDirectionType == Direction::Vertical)
 	{
 		ContentInfo.height += image->height();

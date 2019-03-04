@@ -11,29 +11,45 @@
 //SkPoint
 
 
-class Button :public UIWidget{
+
+class Button :public UIWidget {
 public:
-	Button(const char *pNormalPath,const char *pPressedPath=0,const char *pDisabledPath=0);
-
-	void SetButtonNormal(const char *pImagePath);
-	void SetButtonPressed(const char *pImagePath);
-	void SetButtonDisabled(const char *pImagePath);
+	Button();
 	void SetEnable(bool bEnable);
-
+	void SetText(const char *pText);
 	enum {
 		but_NormalStatu,
 		but_MouseStayStatu,
 		but_DisabledStatu,
 	};
 
-	void Draw(SkCanvas* canvas);
-    void OnMouseMove(int x, int y) override;
+	int GetButState()
+	{
+		return nButState;
+	}
+	void Draw(SkCanvas* canvas) override;
+	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
+private:
+	int nButState;
+	SkString text;
+};
+
+class ButtonImage :public Button{
+public:
+	ButtonImage(const char *pNormalPath,const char *pPressedPath=0,const char *pDisabledPath=0);
+
+	void SetButtonImageNormal(const char *pImagePath);
+	void SetButtonImagePressed(const char *pImagePath);
+	void SetButtonImageDisabled(const char *pImagePath);
+
+	void Draw(SkCanvas* canvas) override;
+
 private:
 	sk_sp<SkImage> NormalImage;
 	sk_sp<SkImage> PressedImage;
 	sk_sp<SkImage> DisabledImage;
-	int nButState;
-	
 
 };
+
+

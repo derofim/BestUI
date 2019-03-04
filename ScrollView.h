@@ -10,6 +10,8 @@
 
 #include "SkSurface.h"
 #include <vector>
+#include "UIRoot.h"
+#include "button.h"
 
 //SkSurface
 
@@ -26,13 +28,14 @@ public:
 		Vertical,
 		Horizontal
 	};
-	ScrollView();
+	ScrollView(UIRoot *pUi);
 
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
 
 	void AddChild(char *pImagePath);
+	void AddChild(UIWidget *pWidget);
 
 	void JumpTop();
 	void JumpBottom();
@@ -48,4 +51,5 @@ private:
 	SkScalar hei;*/
 	Direction nDirectionType;
 	ScrollContentInfo ContentInfo;
+	UIRoot *pUIRoot;
 };
