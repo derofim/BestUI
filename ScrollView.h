@@ -11,7 +11,7 @@
 #include "SkSurface.h"
 #include <vector>
 #include "UIRoot.h"
-#include "button.h"
+//#include "button.h"
 
 //SkSurface
 
@@ -28,7 +28,7 @@ public:
 		Vertical,
 		Horizontal
 	};
-	ScrollView(UIRoot *pUi);
+	ScrollView();
 
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
@@ -51,5 +51,7 @@ private:
 	SkScalar hei;*/
 	Direction nDirectionType;
 	ScrollContentInfo ContentInfo;
-	UIRoot *pUIRoot;
+
+	std::vector<UIWidget *> childlist;
+
 };

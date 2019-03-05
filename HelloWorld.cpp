@@ -16,7 +16,9 @@
 
 #include "SkDashPathEffect.h"
 #include "SkTime.h"
-#include "button.h"
+#include "Button.h"
+#include "ScrollView.h"
+#include "Sprite.h"
 using namespace sk_app;
 
 Application* Application::Create(int argc, char** argv, void* platformData) {
@@ -27,13 +29,20 @@ Application* Application::Create(int argc, char** argv, void* platformData) {
 
 void HelloWorld::ClickCallback(UIWidget *pWidget)
 {
+	Button *but =(Button *) pWidget;
+	const char *pBuf = but->GetText().c_str();
+	printf("%s\n", pBuf);
 	int a;
 	a = 5;
 }
-
+#include "windows.h"
 HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	: fBackendType(Window::kNativeGL_BackendType), fRotationAngle(0) {
 	SkGraphics::Init();
+
+	AllocConsole();
+	AttachConsole(GetCurrentProcessId());
+	freopen("CON", "w", stdout);
 
 	fWindow = Window::CreateNativeWindow(platformData);
 	fWindow->setRequestedDisplayParams(DisplayParams());
@@ -43,11 +52,35 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 
 	fWindow->attach(fBackendType);
 
-	Button *but = new Button("a.png", "b.png", "c.png");
-	but->SetPosition(300, 300);
-	this->AddWidget(but);
+	
 
-	but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
+	
+
+	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
+
+
+	
+	ScrollView *sview = new ScrollView();
+	char pszPath[256];
+	
+
+	for (int k = 0; k <10; k++)
+	{
+		Button *but = new Button();
+		but->SetText(pszTest[k]);
+		but->SetSize(120, 35);
+		sview->AddChild(but);
+		but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
+		
+	}
+
+
+	sview->SetPosition(100, 200);
+	sview->SetSize(280, 150);
+//	sview->JumpBottom();
+	this->AddWidget(sview);
+
+	
 	
 }
 

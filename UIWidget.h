@@ -17,6 +17,8 @@ public:
 	virtual void Draw(SkCanvas* canvas)=0;
 	void SetPosition(SkScalar x, SkScalar y);
 	void SetSize(SkScalar width, SkScalar height);
+	void SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
+
 
 	virtual void OnMouseDown(int x, int y)=0;
 	virtual void OnMouseMove(int x, int y)=0;

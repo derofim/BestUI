@@ -7,7 +7,7 @@ Sprite::Sprite(const char *pImagePath)
 	if (blob == NULL) return;
 	SpriteImage = SkImage::MakeFromEncoded(blob);
 	SetPosition(0, 0);
-	SetSize(0, 0);
+	SetSize(SpriteImage->width(), SpriteImage->height());
 }
 
 void Sprite::Draw(SkCanvas* canvas)
@@ -15,6 +15,7 @@ void Sprite::Draw(SkCanvas* canvas)
 	if (GetSkRect().right() == 0 || GetSkRect().bottom() == 0)
 		SetSize(SpriteImage->width(), SpriteImage->height());
 	canvas->drawImageRect(SpriteImage.get(), GetSkRect(), 0);
+	//canvas->drawImage(SpriteImage.get(), GetSkRect().left(),GetSkRect().top(), 0);
 }
 
 

@@ -1,44 +1,124 @@
 #include "ScrollView.h"
 
-ScrollView::ScrollView(UIRoot *pUi)
+ScrollView::ScrollView()
 {
 	SetPosition(0, 0);
 	SetSize(0, 0);
 	nDirectionType = Direction::Vertical;
 	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
-	pUIRoot = pUi;
 }
+
+//void ScrollView::Draw(SkCanvas* canvas)
+//{
+//	GrContext* context = canvas->getGrContext();
+//	SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
+//	auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
+//    auto surfaceCanvas = gpuSurface->getCanvas();
+//	SkScalar x = 0, y = 0;
+//
+//	/*ContentInfo.offs += 0.1;
+//	if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+//	{
+//		ContentInfo.offs = 0;
+//	}*/
+//	y = ContentInfo.offs;
+//	for (auto iter = imagelist.begin(); iter != imagelist.end(); iter++)
+//	{
+//		surfaceCanvas->drawImage((*iter).get(), x, y, 0);
+//		y += (*iter)->height();
+//	}
+//	SkFont font;
+//	font.setSubpixel(true);
+//	font.setSize(16);
+//	SkPaint paint;
+//	surfaceCanvas->drawSimpleText("very goods", 10, kUTF8_SkTextEncoding, x, y,font, paint);
+//	sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
+//	canvas->drawImage(image, GetSkRect().left(), GetSkRect().top());
+//}
 
 void ScrollView::Draw(SkCanvas* canvas)
 {
+	SkRect aa;
+	ScrollContentInfo offset;
+	memset(&offset, 0x00, sizeof(offset));
+	offset.height += 10;
+	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
+	{
+		UIWidget *pChild = *iter;
+		if (nDirectionType == Direction::Vertical)
+		{
+	
+			pChild->SetRect(pChild->GetSkRect().left(), offset.height+ ContentInfo.offs, pChild->GetWidth() + pChild->GetSkRect().left(), offset.height + pChild->GetHeight()+ ContentInfo.offs);
+			offset.height += pChild->GetHeight();
+			offset.width = GetWidth();
+		}
+		else if (nDirectionType == Direction::Horizontal)
+		{
+			pChild->SetRect(offset.width+ ContentInfo.offs, pChild->GetSkRect().top(), pChild->GetWidth() + offset.width+ ContentInfo.offs, pChild->GetSkRect().top() + pChild->GetHeight());
+			offset.width += pChild->GetWidth();
+			offset.height = GetHeight();
+
+		}
+	}
+
+
+	ContentInfo.height = offset.height;
+	ContentInfo.width = offset.width;
+
+	//ContentInfo.offs += 0.1;
+	//if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+	//{
+	//	ContentInfo.offs = 0;
+	//}
+	
 	GrContext* context = canvas->getGrContext();
 	SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
 	auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
     auto surfaceCanvas = gpuSurface->getCanvas();
-	SkScalar x = 0, y = 0;
 
-	/*ContentInfo.offs += 0.1;
-	if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+
+	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
 	{
-		ContentInfo.offs = 0;
-	}*/
-	y = ContentInfo.offs;
-	for (auto iter = imagelist.begin(); iter != imagelist.end(); iter++)
-	{
-		surfaceCanvas->drawImage((*iter).get(), x, y, 0);
-		y += (*iter)->height();
+		UIWidget *pChild = *iter;
+		pChild->Draw(surfaceCanvas);
 	}
+	
 	sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
 	canvas->drawImage(image, GetSkRect().left(), GetSkRect().top());
 }
 
-
 void ScrollView::OnMouseMove(int x, int y)
 {
+	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
+	{
+		UIWidget *pChild = *iter;
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		pChild->OnMouseMove(child_x, child_y);
+	
+		if (child_x >= pChild->GetSkRect().left() && child_x <= pChild->GetSkRect().right() && child_y >= pChild->GetSkRect().top() && child_y <= pChild->GetSkRect().bottom())
+			return;
+	}
 }
 
 void  ScrollView::OnMouseDown(int x, int y)
 {
+	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
+	{
+		UIWidget *pChild = *iter;
+
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+
+		if (child_x >= pChild->GetSkRect().left() && child_x <= pChild->GetSkRect().right() && child_y >= pChild->GetSkRect().top() && child_y <= pChild->GetSkRect().bottom())
+		{
+
+			printf("x=%d,y=%d,child_x=%d,child_y=%d,left=%f,right=%f,top=%f,bottom=%f\n", x, y, child_x, child_y, pChild->GetSkRect().left(), pChild->GetSkRect().right(), pChild->GetSkRect().top(), pChild->GetSkRect().bottom());
+			pChild->OnMouseDown(child_x, child_y);
+			return;
+		}
+		
+	}
 }
 
 void ScrollView::SetDirection(Direction nType)
@@ -67,8 +147,7 @@ void ScrollView::JumpRight()
 
 void ScrollView::AddChild(UIWidget *pWidget)
 {
-	//pWidget->add
-//	pUIRoot->AddWidget(pWidget);
+	childlist.push_back(pWidget);
 }
 
 

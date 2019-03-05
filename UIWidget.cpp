@@ -14,6 +14,11 @@ void UIWidget::SetSize(SkScalar width, SkScalar height)
 	rect.set(rect.left(), rect.top(), width + rect.left(), height + rect.top());
 }
 
+void UIWidget::SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom)
+{
+	rect.set(left, top, right, bottom);
+}
+
 
 void UIWidget::SetUiEventCallBack(CallBackFun fu)
 {
