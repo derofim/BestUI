@@ -27,6 +27,8 @@ void UIRoot::DrawWidget(SkCanvas* canvas,UIWidget *pWidget)
 
 void UIRoot::OnMouseDown(int x, int y)
 {
+	if (widgetlist.size() == 0)
+		return;
 	for (auto iter = widgetlist.end()-1; ;iter--)
 	{
 		UIWidget *pWidget = *iter;
@@ -43,6 +45,8 @@ void UIRoot::OnMouseDown(int x, int y)
 
 void  UIRoot::OnMouseMove(int x, int y)
 {
+	if (widgetlist.size() == 0)
+		return;
 	for (auto iter = widgetlist.end() - 1; ; iter--)
 	{
 		UIWidget *pWidget = *iter;

@@ -6,7 +6,7 @@ UIWidget::UIWidget()
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {
-	rect.set(x,y,0,0);
+	rect.set(x,y,x+GetWidth(),y+GetHeight());
 	
 }
 void UIWidget::SetSize(SkScalar width, SkScalar height)

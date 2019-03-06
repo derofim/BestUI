@@ -41,7 +41,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 	SkRect aa;
 	ScrollContentInfo offset;
 	memset(&offset, 0x00, sizeof(offset));
-	offset.height += 10;
+	//offset.height += 10;
 	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
@@ -65,11 +65,11 @@ void ScrollView::Draw(SkCanvas* canvas)
 	ContentInfo.height = offset.height;
 	ContentInfo.width = offset.width;
 
-	//ContentInfo.offs += 0.1;
-	//if (ContentInfo.offs >= ContentInfo.height - GetHeight())
-	//{
-	//	ContentInfo.offs = 0;
-	//}
+	/*ContentInfo.offs += 0.01;
+	if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+	{
+		ContentInfo.offs = 0;
+	}*/
 	
 	GrContext* context = canvas->getGrContext();
 	SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
@@ -96,8 +96,8 @@ void ScrollView::OnMouseMove(int x, int y)
 		int child_y = y - GetSkRect().top();
 		pChild->OnMouseMove(child_x, child_y);
 	
-		if (child_x >= pChild->GetSkRect().left() && child_x <= pChild->GetSkRect().right() && child_y >= pChild->GetSkRect().top() && child_y <= pChild->GetSkRect().bottom())
-			return;
+		//if (child_x >= pChild->GetSkRect().left() && child_x <= pChild->GetSkRect().right() && child_y >= pChild->GetSkRect().top() && child_y <= pChild->GetSkRect().bottom())
+		//	return;
 	}
 }
 

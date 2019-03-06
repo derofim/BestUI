@@ -44,13 +44,6 @@ void ButtonImage::SetButtonImageDisabled(const char *pImagePath)
 	DisabledImage = SkImage::MakeFromEncoded(blob);
 }
 
-//void ButtonImage::SetEnable(bool bEnable)
-//{
-//	if (bEnable == false)
-//		nButState = but_DisabledStatu;
-//	else
-//		nButState = but_NormalStatu;
-//}
 
 
 
@@ -72,24 +65,6 @@ void ButtonImage::Draw(SkCanvas* canvas)
 }
 
 
-//void ButtonImage::OnMouseDown(int x, int y)
-//{
-//	if (nButState == but_DisabledStatu)
-//		return;
-//	if (GetMouseDownCallBack() != NULL)
-//		GetMouseDownCallBack()(this);
-//}
-//
-//
-//void ButtonImage::OnMouseMove(int x,int y)
-//{
-//	if (nButState == but_DisabledStatu)
-//		return;
-//	if (x >= GetSkRect().left() && x <= GetSkRect().right() && y >= GetSkRect().top() && y <= GetSkRect().bottom())
-//		nButState = but_MouseStayStatu;
-//	else
-//		nButState = but_NormalStatu;
-//}
 
 
 Button::Button()
@@ -112,29 +87,8 @@ void Button::SetEnable(bool bEnable)
 		nButState = but_NormalStatu;
 }
 
-#include "SkTextBlob.h"
 
-static void add_to_text_blob(SkTextBlobBuilder* builder, const char* text, const SkFont& font,
-	SkScalar x, SkScalar y) {
-	SkTDArray<uint16_t> glyphs;
 
-	size_t len = strlen(text);
-	glyphs.append(font.countText(text, len, kUTF8_SkTextEncoding));
-	font.textToGlyphs(text, len, kUTF8_SkTextEncoding, glyphs.begin(), glyphs.count());
-
-	const SkScalar advanceX = font.getSize() * 0.85f;
-	const SkScalar advanceY = font.getSize() * 1.5f;
-
-	SkTDArray<SkScalar> pos;
-	for (unsigned i = 0; i < len; ++i) {
-		*pos.append() = x + i * advanceX;
-		*pos.append() = y + i * (advanceY / len);
-	}
-	const SkTextBlobBuilder::RunBuffer& run = builder->allocRunPos(font, glyphs.count());
-	memcpy(run.glyphs, glyphs.begin(), glyphs.count() * sizeof(uint16_t));
-	memcpy(run.pos, pos.begin(), len * sizeof(SkScalar) * 2);
-}
-#include "SkMSAN.h"
 void Button::Draw(SkCanvas* canvas)
 {
 	SkFont font;
@@ -142,15 +96,20 @@ void Button::Draw(SkCanvas* canvas)
 	font.setSize(16);
 	SkPaint paint;
 	
-	
+	SkRect bounds;
+	font.measureText(text.c_str(), text.size(), kUTF8_SkTextEncoding, &bounds);
 	if (nButState == but_NormalStatu)
 	{
-		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetSkRect().left(), GetSkRect().top(), font, paint);
+
+		
+		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetSkRect().left(), GetSkRect().top()-bounds.top(), font, paint);
+
 	}
 	if (nButState == but_MouseStayStatu)
 	{
-		paint.setColor(SK_ColorDKGRAY);
-		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetSkRect().left(), GetSkRect().top(), font, paint);
+		//paint.setColor(SK_ColorDKGRAY);
+		paint.setColor(SK_ColorRED);
+		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetSkRect().left(), GetSkRect().top() - bounds.top(), font, paint);
 	}
 }
 
