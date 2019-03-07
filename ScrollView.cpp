@@ -38,10 +38,8 @@ ScrollView::ScrollView()
 
 void ScrollView::Draw(SkCanvas* canvas)
 {
-	SkRect aa;
 	ScrollContentInfo offset;
 	memset(&offset, 0x00, sizeof(offset));
-	//offset.height += 10;
 	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
@@ -65,10 +63,22 @@ void ScrollView::Draw(SkCanvas* canvas)
 	ContentInfo.height = offset.height;
 	ContentInfo.width = offset.width;
 
-	/*ContentInfo.offs += 0.01;
-	if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+	//test 
+	/*if (nDirectionType == Direction::Vertical)
 	{
-		ContentInfo.offs = 0;
+		ContentInfo.offs += 0.01;
+		if (ContentInfo.offs >= ContentInfo.height - GetHeight())
+		{
+			ContentInfo.offs = 0;
+		}
+	}
+	else if (nDirectionType == Direction::Horizontal)
+	{
+		ContentInfo.offs += 0.1;
+		if (ContentInfo.offs >= ContentInfo.width - GetWidth())
+		{
+			ContentInfo.offs = 0;
+		}
 	}*/
 	
 	GrContext* context = canvas->getGrContext();
@@ -95,9 +105,6 @@ void ScrollView::OnMouseMove(int x, int y)
 		int child_x = x - GetSkRect().left();
 		int child_y = y - GetSkRect().top();
 		pChild->OnMouseMove(child_x, child_y);
-	
-		//if (child_x >= pChild->GetSkRect().left() && child_x <= pChild->GetSkRect().right() && child_y >= pChild->GetSkRect().top() && child_y <= pChild->GetSkRect().bottom())
-		//	return;
 	}
 }
 
@@ -151,29 +158,29 @@ void ScrollView::AddChild(UIWidget *pWidget)
 }
 
 
-void  ScrollView::AddChild(char *pImagePath)
-{
-
-	sk_sp<SkData> blob = SkData::MakeFromFileName(pImagePath);
-	if (blob == NULL) return;
-	sk_sp<SkImage> image = SkImage::MakeFromEncoded(blob);
-	imagelist.push_back(image);
-
-	if (nDirectionType == Direction::Vertical)
-	{
-		ContentInfo.height += image->height();
-		ContentInfo.width = GetWidth();
-	}
-	else if (nDirectionType == Direction::Horizontal)
-	{
-		ContentInfo.width += image->width();
-		ContentInfo.height = GetHeight();
-	}
-
-	//sk_sp<SkSurface> surface =  SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info, 0, &props) : SkSurface::MakeRaster(info, &props);
-
-
-}
+//void  ScrollView::AddChild(char *pImagePath)
+//{
+//
+//	sk_sp<SkData> blob = SkData::MakeFromFileName(pImagePath);
+//	if (blob == NULL) return;
+//	sk_sp<SkImage> image = SkImage::MakeFromEncoded(blob);
+//	imagelist.push_back(image);
+//
+//	if (nDirectionType == Direction::Vertical)
+//	{
+//		ContentInfo.height += image->height();
+//		ContentInfo.width = GetWidth();
+//	}
+//	else if (nDirectionType == Direction::Horizontal)
+//	{
+//		ContentInfo.width += image->width();
+//		ContentInfo.height = GetHeight();
+//	}
+//
+//	//sk_sp<SkSurface> surface =  SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info, 0, &props) : SkSurface::MakeRaster(info, &props);
+//
+//
+//}
 
 //void draw(SkCanvas* canvas) {
 //	SkPaint paint;

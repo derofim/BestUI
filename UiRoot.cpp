@@ -21,7 +21,8 @@ void UIRoot::DrawAllWidget(SkCanvas* canvas)
 
 void UIRoot::DrawWidget(SkCanvas* canvas,UIWidget *pWidget)
 {
-	pWidget->Draw(canvas);
+	if(pWidget->IsVisible())
+	   pWidget->Draw(canvas);
 }
 
 
@@ -32,7 +33,7 @@ void UIRoot::OnMouseDown(int x, int y)
 	for (auto iter = widgetlist.end()-1; ;iter--)
 	{
 		UIWidget *pWidget = *iter;
-		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom())
+		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom() && pWidget->IsVisible())
 		{
 			pWidget->OnMouseDown(x, y);
 			return;

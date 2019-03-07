@@ -20,8 +20,16 @@ public:
 	void OnMouseDown(int x, int y) override;
 
 	void SetScale(SkScalar scale);
+	void SetScale(SkScalar sx, SkScalar sy);
 	void SetScaleX(SkScalar sx);
 	void SetScaleY(SkScalar sy);
+
+	void SetOpacity(SkScalar op)
+	{
+		opacity = op;
+	}
 private:
 	sk_sp<SkImage> SpriteImage;
+
+	SkScalar opacity;
 };

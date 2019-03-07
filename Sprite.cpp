@@ -68,40 +68,45 @@ Sprite::Sprite(const char *pImagePath)
 	SpriteImage = SkImage::MakeFromEncoded(blob);
 	SetPosition(0, 0);
 	SetSize(SpriteImage->width(), SpriteImage->height());
+	opacity = 1.0;
 }
 
 void Sprite::Draw(SkCanvas* canvas)
 {
-	if (GetSkRect().right() == 0 || GetSkRect().bottom() == 0)
-		SetSize(SpriteImage->width(), SpriteImage->height());
-	canvas->drawImageRect(SpriteImage.get(), GetSkRect(), 0);
-	//canvas->drawImage(SpriteImage.get(), GetSkRect().left(),GetSkRect().top(), 0);
+	SkPaint paint;
+	paint.setAlpha(opacity*255);
+	canvas->drawImageRect(SpriteImage.get(), GetSkRect(), &paint);
 }
 
 
-void Sprite::SetScale(SkScalar scale)
+
+void Sprite::SetScale(SkScalar sx, SkScalar sy)
 {
-	SkImageInfo info = SkImageInfo::MakeN32Premul(SpriteImage->width() * scale, SpriteImage->height() * scale);
+	SkImageInfo info = SkImageInfo::MakeN32Premul(SpriteImage->width() * sx, SpriteImage->height() * sy);
 	SkAutoPixmapStorage scaled;
 	scaled.alloc(info);
-	
+
 	SpriteImage->scalePixels(scaled, kHigh_SkFilterQuality, SkImage::kDisallow_CachingHint);
 
 	delete SpriteImage.get();
 	//不知道会不会内存泄漏
-    SpriteImage =SkImage::MakeRasterCopy(scaled);
-	SetSize(SpriteImage->width() , SpriteImage->height() );
+	SpriteImage = SkImage::MakeRasterCopy(scaled);
+	SetSize(SpriteImage->width(), SpriteImage->height());
+}
+
+void Sprite::SetScale(SkScalar scale)
+{
+	SetScale(scale, scale);
 }
 
 void Sprite::SetScaleX(SkScalar sx)
 {
-	SetSize(SpriteImage->width() * sx, SpriteImage->height());
-	//SpriteImage.get().
+	SetScale(sx, 1.0);
 }
 
 void Sprite::SetScaleY(SkScalar sy)
 {
-	SetSize(SpriteImage->width(),SpriteImage->height() * sy);
+	SetScale(1.0,sy);
 }
 
 

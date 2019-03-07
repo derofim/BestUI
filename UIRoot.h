@@ -12,3 +12,17 @@ public:
 private:
 	std::vector<UIWidget *> widgetlist;
 };
+
+//SkTime
+//class Action {
+//public:
+//	enum ActionType{
+//		Blink,
+//		MoveTo
+//	};
+//	virtual void StartAction(SkCanvas times, ActionType type) = 0;
+//	virtual void StopAction(int nId) = 0;
+//private:
+//	SkCanvas runtimes;
+//	int nActionId;
+//};

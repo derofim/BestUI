@@ -47,10 +47,19 @@ public:
 	{
 		nTag = nSet;
 	}
+	bool IsVisible()
+	{
+		return bShowWindow;
+	}
+	void SetVisible(bool bVisible)
+	{
+		bShowWindow = bVisible;
+	}
 
 private:
 	//SkPoint point;
 	SkRect rect;
 	CallBackFun callbackf;
 	int nTag;
+	bool bShowWindow;
 };

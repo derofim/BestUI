@@ -3,6 +3,7 @@
 UIWidget::UIWidget()
 {
 	callbackf = NULL;
+	SetVisible(true);
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {

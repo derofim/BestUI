@@ -34,7 +34,7 @@ public:
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
 
-	void AddChild(char *pImagePath);
+//	void AddChild(char *pImagePath);
 	void AddChild(UIWidget *pWidget);
 
 	void JumpTop();
