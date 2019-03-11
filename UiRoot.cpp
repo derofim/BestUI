@@ -6,6 +6,7 @@ void UIRoot::AddWidget(UIWidget *pWidget, int nShowOrder)
 {
 	pWidget->nShowOrder = nShowOrder;
 	widgetlist.push_back(pWidget);
+	pActionManage = gActionManage;
 }
 
 void UIRoot::DrawAllWidget(SkCanvas* canvas)
@@ -16,6 +17,7 @@ void UIRoot::DrawAllWidget(SkCanvas* canvas)
 	{
 		DrawWidget(canvas,*iter);
 	}
+	pActionManage->UpdateAllAction();
 
 }
 

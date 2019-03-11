@@ -1,11 +1,17 @@
 #pragma once
-#include "UIWidget.h"
+
+
 #include "GrContext.h"
 #include "SkCanvas.h"
 #include "SkFont.h"
 #include "SkGradientShader.h"
 #include "SkGraphics.h"
 #include "SkImage.h"
+#include "Action.h"
+
+class Action;
+
+extern  ActionManage *gActionManage;
 
 class UIWidget;
 typedef std::function<void(UIWidget *p)> CallBackFun;
@@ -18,6 +24,9 @@ public:
 	void SetPosition(SkScalar x, SkScalar y);
 	void SetSize(SkScalar width, SkScalar height);
 	void SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
+
+	void RunAction(Action *type);
+
 
 
 	virtual void OnMouseDown(int x, int y)=0;
@@ -58,6 +67,7 @@ public:
 
 private:
 	//SkPoint point;
+	ActionManage *pActionManage;
 	SkRect rect;
 	CallBackFun callbackf;
 	int nTag;

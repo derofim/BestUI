@@ -4,6 +4,7 @@ UIWidget::UIWidget()
 {
 	callbackf = NULL;
 	SetVisible(true);
+	pActionManage = gActionManage;
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {
@@ -21,10 +22,20 @@ void UIWidget::SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bot
 }
 
 
+void UIWidget::RunAction(Action *type)
+{
+	pActionManage->AddAction(type, this);
+}
+
 void UIWidget::SetUiEventCallBack(CallBackFun fu)
 {
 	callbackf = fu;
 }
+
+//void UIWidget::RunAction(Action *type)
+//{
+//
+//}
 
 //void UIWidget::OnMouseDown(int x, int y)
 //{

@@ -1,6 +1,11 @@
 #pragma once
 #include "UIWidget.h"
 #include <vector>
+
+#include "Action.h"
+class Action;
+
+extern  ActionManage *gActionManage;
 class UIRoot {
 public:
 	void AddWidget(UIWidget *pWidget,int nShowOrder=0);
@@ -10,6 +15,7 @@ public:
 	void OnMouseDown(int x, int y);
 	void OnMouseMove(int x, int y);
 private:
+	ActionManage *pActionManage;
 	std::vector<UIWidget *> widgetlist;
 };
 

@@ -19,12 +19,19 @@
 #include "Button.h"
 #include "ScrollView.h"
 #include "Sprite.h"
+#include "Action.h"
 using namespace sk_app;
 
+
+ ActionManage *gActionManage;
+
 Application* Application::Create(int argc, char** argv, void* platformData) {
+
+
 	return new HelloWorld(argc, argv, platformData);
 
 	//std::max();
+
 }
 
 void HelloWorld::ClickCallback(UIWidget *pWidget)
@@ -36,13 +43,16 @@ void HelloWorld::ClickCallback(UIWidget *pWidget)
 	a = 5;
 }
 #include "windows.h"
+
 HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	: fBackendType(Window::kNativeGL_BackendType), fRotationAngle(0) {
 	SkGraphics::Init();
 
-	AllocConsole();
+	/*AllocConsole();
 	AttachConsole(GetCurrentProcessId());
-	freopen("CON", "w", stdout);
+	freopen("CON", "w", stdout);*/
+
+	gActionManage = new ActionManage();
 
 	fWindow = Window::CreateNativeWindow(platformData);
 	fWindow->setRequestedDisplayParams(DisplayParams());
@@ -58,27 +68,45 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 
 	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
 
-
 	
-	ScrollView *sview = new ScrollView();
+	/*Button *but = new Button();
+	but->SetText(pszTest[0]);
+	but->SetSize(80, 17);
+	but->SetPosition(100, 100);
+	this->AddWidget(but);
+	but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));*/
+	
+	//ScrollView *sview = new ScrollView();
+	//char pszPath[256];
+	//
+
+	//for (int k = 0; k <10; k++)
+	//{
+	//	Button *but = new Button();
+	//	but->SetText(pszTest[k]);
+	//	but->SetSize(100, 25);
+	//	sview->AddChild(but);
+	//	but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
+	//	
+	//}
+
+	//sview->SetDirection(ScrollView::Direction::Horizontal);
+	//sview->SetPosition(100, 200);
+	//sview->SetSize(380,30);
+	////sview->JumpBottom();
+	//this->AddWidget(sview);
+
 	char pszPath[256];
-	
-
-	for (int k = 0; k <10; k++)
-	{
-		Button *but = new Button();
-		but->SetText(pszTest[k]);
-		but->SetSize(120, 35);
-		sview->AddChild(but);
-		but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
-		
-	}
+	sprintf_s(pszPath, 256, "H:\\0.png");
+	Sprite *p = new Sprite(pszPath);
+	this->AddWidget(p);
+	p->SetPosition(100, 100);
+	Blink *pBlink = new Blink(5, 5);
+	p->RunAction(pBlink);
+	//p->SetOpacity(0.2);
+	//p->SetScaleY(3);
 
 
-	sview->SetPosition(100, 200);
-	sview->SetSize(280, 150);
-//	sview->JumpBottom();
-	this->AddWidget(sview);
 
 	
 	
