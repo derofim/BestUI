@@ -20,12 +20,7 @@
 //
 
 //
-////顺序执行
-//class Sequence :public ActionManage
-//{
-//public:
-//	//RunAction()
-//};
+
 //
 //
 ////同时执行
@@ -50,10 +45,7 @@
 //
 //};
 //
-//class DelayTime :public Action
-//{
-//public:
-//};
+
 //
 //class Blink :public Action
 //{
@@ -71,16 +63,20 @@ class Action {
 public:
 
 	enum ActState{
-		NotStart,
+		Ready,
 		Start,
 		Stop
 	};
 	Action();
 	//void SetStopActionCallBack();
-	virtual void StartAction();
-	virtual void StopAction();
+	virtual void StartAction()=0;
+	virtual void StopAction()=0;
+
 
 	virtual void update() = 0;
+
+	bool ActionIsStart();
+	void ReadyAction(double fDelayTime = 0);
 
 	void SetRunTime(double ftime)
 	{
@@ -108,10 +104,12 @@ public:
 		return st;
 	}
 private:
+	double initstamp;
 	double endstamp;
 	double runstamp;
 	UIWidget *pWidget;
 	ActState st;
+	bool bStartFlag;
   
 };
 
@@ -119,22 +117,40 @@ class ActionManage
 {
 public:
 	ActionManage();
-	void AddAction(Action *act, UIWidget *pWidget);
+	void AddAction(Action *act, UIWidget *pWidget,double fDelayTime=0);
 	void UpdateAllAction();
 private:
 	std::vector<Action *> actionlist;
 };
 
+
+class Sequence /*:public ActionManage*/
+{
+public:
+	Sequence(UIWidget *pUi,...);
+private:
+	ActionManage *pActionManage;
+	//RunAction()
+};
 class Blink :public Action
 {
 public:
 	Blink(double runtime, int nBlink);
-	void StartAction();
-	void StopAction();
+	void StartAction() override;
+	void StopAction()override;
 	void update() override;
 private:
 	int nBlinkTick;
 	double fLastStamp;
 	bool bVisble;
 	
+};
+
+class DelayTime :public Action
+{
+public:
+	DelayTime(double runtime);
+	void update() override;
+	void StopAction() override {};
+	void StartAction() override {};
 };

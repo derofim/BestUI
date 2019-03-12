@@ -12,25 +12,20 @@ Blink::Blink(double time, int nBlink)
 void Blink::StartAction()
 {
 	fLastStamp = SkTime::GetMSecs();
-	Action::StartAction();
+
 }
 
 
 void Blink::StopAction()
 {
 	GetWidget()->SetVisible(true);
-	Action::StopAction();
 }
 
 void Blink::update()
 {
 	double fEachBlink = GetRunTime() / nBlinkTick/2;
-	
-	if (SkTime::GetMSecs() > GetEndStamp())
-	{
-		StopAction();
+	if (ActionIsStart() == false)
 		return;
-	}
 	if (SkTime::GetMSecs() - fLastStamp >= fEachBlink)
 	{
 		GetWidget()->SetVisible(bVisble);
@@ -39,23 +34,77 @@ void Blink::update()
 	}
 }
 
+DelayTime::DelayTime(double time)
+{
+	SetRunTime(time);
+}
+
+void DelayTime::update()
+{
+	ActionIsStart();
+}
+
+
+
+Sequence::Sequence(UIWidget *pUi, ...)
+{
+	pActionManage = gActionManage;
+	va_list params;
+	va_start(params, pUi);
+
+//	pActionManage->AddAction(act,)
+	double fDelayTime = 0;
+	for (;;)
+	{
+		Action *pAct= va_arg(params, Action *);
+		if (pAct == NULL)
+			break;
+		pActionManage->AddAction(pAct, pUi, fDelayTime);
+		fDelayTime += pAct->GetRunTime();
+	}
+	va_end(params);
+}
+
 Action::Action()
 {
 	pWidget = NULL;
-	st = NotStart;
+	bStartFlag = false;
 }
 
-void Action::StartAction()
+bool Action::ActionIsStart()
 {
-	//initstamp = SkTime::GetMSecs();
-	endstamp = SkTime::GetMSecs() + runstamp;
-	st = Start;
-	
+	bool bRet = false;
+	double curstamp=SkTime::GetMSecs();
+	if (curstamp < initstamp)
+		st = Ready;
+	else if (curstamp >= initstamp && curstamp <= endstamp)
+	{
+		st = Start;
+		bRet = true;
+		if (bStartFlag == false)
+		{
+			StartAction();
+			bStartFlag = true;
+		}
+	}
+	else
+	{
+		st = Stop;
+		StopAction();
+	}
+
+	return bRet;
+
+
 }
 
-void Action::StopAction()
+
+
+void Action::ReadyAction(double fDelayTime)
 {
-	st = Stop;
+	initstamp = SkTime::GetMSecs() + fDelayTime;
+	endstamp = initstamp + runstamp;
+//	printf("%f	%f\n", initstamp, endstamp);
 }
 
 
@@ -83,10 +132,10 @@ void ActionManage::UpdateAllAction()
 	}
 }
 
-void ActionManage::AddAction(Action *act, UIWidget *pWidget)
+void ActionManage::AddAction(Action *act, UIWidget *pWidget, double fDelayTime)
 {
 	actionlist.push_back(act);
 	act->SetWidget(pWidget);
-	act->StartAction();
+	act->ReadyAction(fDelayTime);
 }
 
