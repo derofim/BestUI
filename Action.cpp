@@ -1,7 +1,7 @@
 #include "Action.h"
 #include "UIWidget.h"
 
-
+#include "UIRoot.h"
 Blink::Blink(double time, int nBlink)
 {
 	nBlinkTick=nBlink;
@@ -64,6 +64,33 @@ Sequence::Sequence(UIWidget *pUi, ...)
 	}
 	va_end(params);
 }
+
+
+Sequence::~Sequence()
+{
+	int a;
+	a = 5;
+}
+
+//Sequence2::Sequence2(Action *act, ...)
+//{
+//	
+//	va_list params;
+//	va_start(params, act);
+//
+//	//	pActionManage->AddAction(act,)
+//	double fDelayTime = 0;
+//	for (;;)
+//	{
+//		Action *pAct = va_arg(params, Action *);
+//		if (pAct == NULL)
+//			break;
+//		/*pActionManage->AddAction(pAct, pUi, fDelayTime);
+//		fDelayTime += pAct->GetRunTime();*/
+//	}
+//	va_end(params);
+//}
+
 
 Action::Action()
 {
@@ -131,6 +158,8 @@ void ActionManage::UpdateAllAction()
 		
 	}
 }
+
+
 
 void ActionManage::AddAction(Action *act, UIWidget *pWidget, double fDelayTime)
 {

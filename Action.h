@@ -3,6 +3,7 @@
 
 #include "GrContext.h"
 #include "SkTime.h"
+#include <map>
 
 //SkTime
 //
@@ -123,15 +124,29 @@ private:
 	std::vector<Action *> actionlist;
 };
 
+//typedef std::function<void(void)> TimerCallBackFun;
+
 
 class Sequence /*:public ActionManage*/
 {
 public:
 	Sequence(UIWidget *pUi,...);
+	~Sequence();
 private:
 	ActionManage *pActionManage;
 	//RunAction()
 };
+
+
+//class Sequence2 :public Action {
+//public:
+//	Sequence2(Action *act1,...);
+//	void update() override {};
+//	void StopAction() override {};
+//	void StartAction() override {};
+//};
+
+
 class Blink :public Action
 {
 public:

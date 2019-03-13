@@ -3,10 +3,31 @@
 #include <vector>
 
 #include "Action.h"
+#include "GameTimer.h"
 class Action;
 
 extern  ActionManage *gActionManage;
-class UIRoot {
+extern  GameTimerManage *gTimerManage;
+class UIShard {
+public:
+	UIShard();
+	void RunAction(Action *type);
+	void SetTimer(TimerCallBackFun fun,double fElapse);
+	void KillTimer(TimerCallBackFun fun);
+	ActionManage *GetActionManage()
+	{
+		return pActionManage;
+	}
+	GameTimerManage *GetTimerManage()
+	{
+		return pTimerManage;
+	}
+private:
+	ActionManage *pActionManage;
+	GameTimerManage *pTimerManage;
+};
+
+class UIRoot:public UIShard{
 public:
 	void AddWidget(UIWidget *pWidget,int nShowOrder=0);
 	void DrawAllWidget(SkCanvas* canvas);
@@ -15,20 +36,6 @@ public:
 	void OnMouseDown(int x, int y);
 	void OnMouseMove(int x, int y);
 private:
-	ActionManage *pActionManage;
 	std::vector<UIWidget *> widgetlist;
 };
 
-//SkTime
-//class Action {
-//public:
-//	enum ActionType{
-//		Blink,
-//		MoveTo
-//	};
-//	virtual void StartAction(SkCanvas times, ActionType type) = 0;
-//	virtual void StopAction(int nId) = 0;
-//private:
-//	SkCanvas runtimes;
-//	int nActionId;
-//};

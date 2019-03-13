@@ -6,7 +6,7 @@ void UIRoot::AddWidget(UIWidget *pWidget, int nShowOrder)
 {
 	pWidget->nShowOrder = nShowOrder;
 	widgetlist.push_back(pWidget);
-	pActionManage = gActionManage;
+	
 }
 
 void UIRoot::DrawAllWidget(SkCanvas* canvas)
@@ -17,7 +17,8 @@ void UIRoot::DrawAllWidget(SkCanvas* canvas)
 	{
 		DrawWidget(canvas,*iter);
 	}
-	pActionManage->UpdateAllAction();
+	GetTimerManage()->UpdateAllGameTimer();
+	GetActionManage()->UpdateAllAction();
 
 }
 
@@ -59,4 +60,28 @@ void  UIRoot::OnMouseMove(int x, int y)
 		if (iter == widgetlist.begin())
 			break;
 	}
+}
+
+
+UIShard::UIShard()
+{
+	gActionManage = new ActionManage();
+	gTimerManage = new GameTimerManage();
+	pActionManage = gActionManage;
+	pTimerManage =  gTimerManage;
+}
+
+void UIShard::RunAction(Action *type)
+{
+
+}
+
+void UIShard::SetTimer(TimerCallBackFun fun, double fElapse)
+{
+	pTimerManage->SetTimer(this,fun, fElapse);
+}
+
+void UIShard::KillTimer(TimerCallBackFun fun)
+{
+	pTimerManage->KillTimer(fun);
 }
