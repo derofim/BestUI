@@ -27,7 +27,7 @@ public:
 
 	void RunAction(Action *type);
 
-
+//	void RunSequence(ActCallBackFun callback, ...);
 
 	virtual void OnMouseDown(int x, int y)=0;
 	virtual void OnMouseMove(int x, int y)=0;

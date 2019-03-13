@@ -57,8 +57,7 @@
 //};
 
 
-//typedef std::function<void(UIWidget *p)> CallBackFun;
-
+typedef std::function<void(void)> ActCallBackFun;
 class UIWidget;
 class Action {
 public:
@@ -130,7 +129,7 @@ private:
 class Sequence /*:public ActionManage*/
 {
 public:
-	Sequence(UIWidget *pUi,...);
+	Sequence(UIWidget *pUi, ActCallBackFun callback,...);
 	~Sequence();
 private:
 	ActionManage *pActionManage;
@@ -161,11 +160,15 @@ private:
 	
 };
 
+
+
 class DelayTime :public Action
 {
 public:
-	DelayTime(double runtime);
+	DelayTime(double runtime, ActCallBackFun callback=0);
 	void update() override;
-	void StopAction() override {};
+	void StopAction() override ;
 	void StartAction() override {};
+private:
+	ActCallBackFun fun;
 };

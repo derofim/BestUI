@@ -27,6 +27,8 @@ public:
 	bool onMouse(int x, int y, sk_app::Window::InputState state, uint32_t modifiers) override;
 
 	void ClickCallback(UIWidget *pWidget);
+	void TestTimer();
+	void TestTimer2();
 private:
     void updateTitle();
 

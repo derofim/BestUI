@@ -73,7 +73,7 @@ UIShard::UIShard()
 
 void UIShard::RunAction(Action *type)
 {
-
+	pActionManage->AddAction(type, 0);
 }
 
 void UIShard::SetTimer(TimerCallBackFun fun, double fElapse)

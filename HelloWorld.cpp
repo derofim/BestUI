@@ -24,7 +24,7 @@ using namespace sk_app;
 
 
  ActionManage *gActionManage;
-
+ GameTimerManage *gTimerManage;
 Application* Application::Create(int argc, char** argv, void* platformData) {
 
 
@@ -44,15 +44,27 @@ void HelloWorld::ClickCallback(UIWidget *pWidget)
 }
 #include "windows.h"
 
+void HelloWorld::TestTimer()
+{
+	printf("TestTimer %f\n", SkTime::GetMSecs());
+	
+}
+
+void HelloWorld::TestTimer2()
+{
+	printf("TestTimer2 %f\n", SkTime::GetMSecs());
+	//this->KillTimer(timer_sel(HelloWorld::TestTimer));
+}
+
 HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	: fBackendType(Window::kNativeGL_BackendType), fRotationAngle(0) {
 	SkGraphics::Init();
 
-	/*AllocConsole();
+	AllocConsole();
 	AttachConsole(GetCurrentProcessId());
-	freopen("CON", "w", stdout);*/
+	freopen("CON", "w", stdout);
 
-	gActionManage = new ActionManage();
+	
 
 	fWindow = Window::CreateNativeWindow(platformData);
 	fWindow->setRequestedDisplayParams(DisplayParams());
@@ -63,12 +75,15 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	fWindow->attach(fBackendType);
 
 	
-
+	//this->SetTimer(std::bind(&HelloWorld::TestTimer, this), 10);
+	//TimerCallBackFun p2 = static_cast<TimerCallBackFun>(&HelloWorld::TestTimer);
+	this->SetTimer(timer_sel(HelloWorld::TestTimer), 2);
+	this->SetTimer(timer_sel(HelloWorld::TestTimer2), 5);
 	
 
 	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
 
-	
+
 	/*Button *but = new Button();
 	but->SetText(pszTest[0]);
 	but->SetSize(80, 17);
@@ -97,12 +112,41 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	//this->AddWidget(sview);
 
 	char pszPath[256];
-	sprintf_s(pszPath, 256, "H:\\0.png");
+	sprintf_s(pszPath, 256, "G:\\0.png");
 	Sprite *p = new Sprite(pszPath);
 	this->AddWidget(p);
 	p->SetPosition(100, 100);
-	Blink *pBlink = new Blink(5, 5);
-	p->RunAction(pBlink);
+
+	//p->RunAction(new DelayTime(10.2, [&](void){
+	//	  printf("kkkkk\n");
+	//	//  this->KillTimer(timer_sel(HelloWorld::TestTimer));
+	//   }
+	//));
+
+	//this->RunAction(new DelayTime(18, [&](void) {
+	//	printf("jjjjj\n");
+	//	this->KillTimer(timer_sel(HelloWorld::TestTimer2));
+	// }
+	//));
+
+
+	//new Sequence(p, de, pBlink, 0);
+
+	Blink *pBlink = new Blink(2, 2);
+	DelayTime *de = new DelayTime(2);
+
+	Sequence se =  Sequence(p, [&](void) {
+		printf("kkkkk222222\n");
+		this->KillTimer(timer_sel(HelloWorld::TestTimer));
+	},pBlink,de,0);
+
+	//Sequence *se=new Sequence(p, de, pBlink,0);
+
+	
+	//p->RunAction(pBlink);
+
+	//
+	//p->RunAction(de);
 	//p->SetOpacity(0.2);
 	//p->SetScaleY(3);
 

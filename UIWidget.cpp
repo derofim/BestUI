@@ -27,6 +27,11 @@ void UIWidget::RunAction(Action *type)
 	pActionManage->AddAction(type, this);
 }
 
+//void UIWidget::RunSequence(ActCallBackFun callback, ...)
+//{
+//	Sequence(this, callback);
+//}
+
 void UIWidget::SetUiEventCallBack(CallBackFun fu)
 {
 	callbackf = fu;

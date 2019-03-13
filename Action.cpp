@@ -34,9 +34,10 @@ void Blink::update()
 	}
 }
 
-DelayTime::DelayTime(double time)
+DelayTime::DelayTime(double time, ActCallBackFun callback)
 {
 	SetRunTime(time);
+	fun = callback;
 }
 
 void DelayTime::update()
@@ -45,12 +46,18 @@ void DelayTime::update()
 }
 
 
+void DelayTime::StopAction()
+{
+	if (fun != 0)
+		fun();
+}
 
-Sequence::Sequence(UIWidget *pUi, ...)
+
+Sequence::Sequence(UIWidget *pUi, ActCallBackFun callback, ...)
 {
 	pActionManage = gActionManage;
 	va_list params;
-	va_start(params, pUi);
+	va_start(params, callback);
 
 //	pActionManage->AddAction(act,)
 	double fDelayTime = 0;
@@ -63,6 +70,11 @@ Sequence::Sequence(UIWidget *pUi, ...)
 		fDelayTime += pAct->GetRunTime();
 	}
 	va_end(params);
+
+	if (callback != NULL)
+	{
+		pActionManage->AddAction(new DelayTime(fDelayTime/1000, callback), pUi,0);
+	}
 }
 
 
