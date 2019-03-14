@@ -5,6 +5,7 @@ UIWidget::UIWidget()
 	callbackf = NULL;
 	SetVisible(true);
 	pActionManage = gActionManage;
+	fDegress = 0;
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {

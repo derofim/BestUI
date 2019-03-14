@@ -115,8 +115,12 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	sprintf_s(pszPath, 256, "G:\\0.png");
 	Sprite *p = new Sprite(pszPath);
 	this->AddWidget(p);
-	p->SetPosition(100, 100);
+	p->SetPosition(300, 300);
 
+	/*RotateTo *ro = new RotateTo(5, 360);
+	p->RunAction(ro);*/
+	MoveTo *to = new MoveTo(2, 800, 500);
+	p->RunAction(to);
 	//p->RunAction(new DelayTime(10.2, [&](void){
 	//	  printf("kkkkk\n");
 	//	//  this->KillTimer(timer_sel(HelloWorld::TestTimer));
@@ -132,13 +136,13 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 
 	//new Sequence(p, de, pBlink, 0);
 
-	Blink *pBlink = new Blink(2, 2);
-	DelayTime *de = new DelayTime(2);
+	//Blink *pBlink = new Blink(2, 2);
+	//DelayTime *de = new DelayTime(2);
 
-	Sequence se =  Sequence(p, [&](void) {
-		printf("kkkkk222222\n");
-		this->KillTimer(timer_sel(HelloWorld::TestTimer));
-	},pBlink,de,0);
+	//Sequence se =  Sequence(p, [&](void) {
+	//	printf("kkkkk222222\n");
+	//	this->KillTimer(timer_sel(HelloWorld::TestTimer));
+	//},pBlink,de,0);
 
 	//Sequence *se=new Sequence(p, de, pBlink,0);
 

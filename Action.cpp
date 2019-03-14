@@ -2,10 +2,10 @@
 #include "UIWidget.h"
 
 #include "UIRoot.h"
-Blink::Blink(double time, int nBlink)
+Blink::Blink(double runtime, int nBlink)
 {
 	nBlinkTick=nBlink;
-	SetRunTime(time);
+	SetRunTime(runtime);
 	bVisble = false;
 }
 
@@ -34,9 +34,68 @@ void Blink::update()
 	}
 }
 
-DelayTime::DelayTime(double time, ActCallBackFun callback)
+MoveTo::MoveTo(double runtime, SkScalar x, SkScalar y)
 {
-	SetRunTime(time);
+	SetRunTime(runtime);
+	move_x = x;
+	move_y = y;
+	
+}
+
+void MoveTo::StartAction()
+{
+	init_x = GetWidget()->GetSkRect().left();
+	init_y = GetWidget()->GetSkRect().top();
+	/*range_x = fabs(move_x - GetWidget()->GetSkRect().left());
+	range_y = fabs(move_y - GetWidget()->GetSkRect().top());*/
+	range_x = move_x - GetWidget()->GetSkRect().left();
+	range_y = move_y - GetWidget()->GetSkRect().top();
+}
+void MoveTo::StopAction()
+{
+	GetWidget()->SetPosition(move_x, move_y);
+}
+
+void MoveTo::update()
+{
+	if (ActionIsStart() == false)
+		return;
+	double curstamp = SkTime::GetMSecs();
+	double rate=(curstamp - GetInitStamp())/ GetRunTime();
+	SkScalar x, y;
+	x = rate * range_x+init_x;
+	y = rate * range_y+init_y;
+	GetWidget()->SetPosition(x, y);
+}
+
+
+RotateTo::RotateTo(double runtime, SkScalar degrees)
+{
+	SetRunTime(runtime);
+	fDegress=degrees;
+}
+
+void RotateTo::StartAction()
+{
+}
+
+void RotateTo::StopAction()
+{
+	GetWidget()->SetDegress(fDegress);
+}
+
+void RotateTo::update()
+{
+	if (ActionIsStart() == false)
+		return;
+	double curstamp = SkTime::GetMSecs();
+	double rate = (curstamp - GetInitStamp()) / GetRunTime();
+	GetWidget()->SetDegress(rate*fDegress);
+}
+
+DelayTime::DelayTime(double runtime, ActCallBackFun callback)
+{
+	SetRunTime(runtime);
 	fun = callback;
 }
 
@@ -84,24 +143,7 @@ Sequence::~Sequence()
 	a = 5;
 }
 
-//Sequence2::Sequence2(Action *act, ...)
-//{
-//	
-//	va_list params;
-//	va_start(params, act);
-//
-//	//	pActionManage->AddAction(act,)
-//	double fDelayTime = 0;
-//	for (;;)
-//	{
-//		Action *pAct = va_arg(params, Action *);
-//		if (pAct == NULL)
-//			break;
-//		/*pActionManage->AddAction(pAct, pUi, fDelayTime);
-//		fDelayTime += pAct->GetRunTime();*/
-//	}
-//	va_end(params);
-//}
+
 
 
 Action::Action()

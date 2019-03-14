@@ -75,7 +75,15 @@ void Sprite::Draw(SkCanvas* canvas)
 {
 	SkPaint paint;
 	paint.setAlpha(opacity*255);
+
+	/*SkColorMatrix matrix;
+	matrix.setRotate(SkColorMatrix::kG_Axis, 180);
+	paint.setColorFilter(SkColorFilter::MakeMatrixFilterRowMajor255(matrix.fMat));*/
+
+	canvas->save();
+	canvas->rotate(GetDegress(), GetSkRect().left(), GetSkRect().top());
 	canvas->drawImageRect(SpriteImage.get(), GetSkRect(), &paint);
+	canvas->restore();
 }
 
 

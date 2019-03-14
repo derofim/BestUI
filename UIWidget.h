@@ -65,6 +65,15 @@ public:
 		bShowWindow = bVisible;
 	}
 
+	SkScalar GetDegress()
+	{
+		return fDegress;
+	}
+	void SetDegress(SkScalar degress)
+	{
+		fDegress = degress;
+	}
+
 private:
 	//SkPoint point;
 	ActionManage *pActionManage;
@@ -72,4 +81,5 @@ private:
 	CallBackFun callbackf;
 	int nTag;
 	bool bShowWindow;
+	SkScalar fDegress;
 };

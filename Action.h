@@ -36,10 +36,7 @@
 //public:
 //};
 //
-//class MoveTo :public Action
-//{
-//
-//};
+
 //
 //class MoveBy :public Action
 //{
@@ -89,6 +86,10 @@ public:
 	double GetEndStamp()
 	{
 		return endstamp;
+	}
+	double GetInitStamp()
+	{
+		return initstamp;
 	}
 	UIWidget* GetWidget()
 	{
@@ -161,6 +162,34 @@ private:
 };
 
 
+class MoveTo :public Action
+{
+public:
+	MoveTo(double runtime, SkScalar x, SkScalar y);
+	void StartAction() override;
+	void StopAction()override;
+	void update() override;
+private:
+	SkScalar move_x;
+	SkScalar move_y;
+	SkScalar range_x;
+	SkScalar range_y;
+	SkScalar init_x;
+	SkScalar init_y;
+
+};
+
+
+class RotateTo :public Action 
+{
+public:
+	RotateTo(double runtime, SkScalar degrees);
+	void StartAction() override;
+	void StopAction()override;
+	void update() override;
+private:
+	SkScalar fDegress;
+};
 
 class DelayTime :public Action
 {
