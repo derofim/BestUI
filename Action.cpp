@@ -112,35 +112,95 @@ void DelayTime::StopAction()
 }
 
 
-Sequence::Sequence(UIWidget *pUi, ActCallBackFun callback, ...)
+Repeat::Repeat(UIWidget *pUi, Action *act, int nRep, ActCallBackFun callback)
 {
 	pActionManage = gActionManage;
-	va_list params;
-	va_start(params, callback);
-
-//	pActionManage->AddAction(act,)
 	double fDelayTime = 0;
-	for (;;)
+	 
+	Action *pAct = act;
+	for (int k = 0; k < nRep; k++)
 	{
-		Action *pAct= va_arg(params, Action *);
-		if (pAct == NULL)
-			break;
+		if (k != 0)
+		{
+			pAct = pAct->clone();
+		}
 		pActionManage->AddAction(pAct, pUi, fDelayTime);
+		
 		fDelayTime += pAct->GetRunTime();
 	}
-	va_end(params);
-
 	if (callback != NULL)
 	{
-		pActionManage->AddAction(new DelayTime(fDelayTime/1000, callback), pUi,0);
+		pActionManage->AddAction(new DelayTime(fDelayTime / 1000, callback), pUi, 0);
 	}
 }
 
+Repeat::Repeat(UIWidget *pUi, Sequence *seq, int nRep, ActCallBackFun callback)
+{
+	double fDelayTime = 0;
+	for (int k = 0; k < nRep; k++)
+	{
+		fDelayTime+=seq->RunSequence();
+	}
+	if (callback != NULL)
+	{
+		pActionManage->AddAction(new DelayTime(fDelayTime / 1000, callback), pUi, 0);
+	}
+}
+
+Sequence::Sequence(UIWidget *pUi, ActCallBackFun callback, ...)
+{
+	pActionManage = gActionManage;
+	fun = callback;
+	pWidget = pUi;
+	va_list params;
+	va_start(params, callback);
+
+	for (;;)
+	{
+		Action *pAct = va_arg(params, Action *);
+		if (pAct == NULL)
+			break;
+		list.push_back(pAct);
+		
+	}
+	va_end(params);
+	nRef = 0;
+	fDelayTotal = 0;
+
+	
+}
+
+double Sequence::RunSequence()
+{
+	double fDelayTime = 0;
+
+	if (nRef > 0)
+	{
+		for (auto iter = list.begin(); iter != list.end(); iter++)
+		{
+			Action *pAct = (*iter)->clone();
+			(*iter) = pAct;
+		}
+	}
+	for (auto iter = list.begin(); iter != list.end();iter++)
+	{
+		Action *pAct = (*iter);
+		pActionManage->AddAction(pAct, pWidget, fDelayTime+ fDelayTotal);
+		fDelayTime += pAct->GetRunTime();
+	}
+
+	if (fun != NULL)
+	{
+		pActionManage->AddAction(new DelayTime((fDelayTime + fDelayTotal) / 1000, fun), pWidget, 0);
+	}
+	nRef++;
+	fDelayTotal += fDelayTime;
+	return fDelayTime;
+}
 
 Sequence::~Sequence()
 {
-	int a;
-	a = 5;
+	list.clear();
 }
 
 

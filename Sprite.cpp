@@ -69,6 +69,7 @@ Sprite::Sprite(const char *pImagePath)
 	SetPosition(0, 0);
 	SetSize(SpriteImage->width(), SpriteImage->height());
 	opacity = 1.0;
+	anchor.set(0.5, 0.5);
 }
 
 void Sprite::Draw(SkCanvas* canvas)
@@ -81,7 +82,7 @@ void Sprite::Draw(SkCanvas* canvas)
 	paint.setColorFilter(SkColorFilter::MakeMatrixFilterRowMajor255(matrix.fMat));*/
 
 	canvas->save();
-	canvas->rotate(GetDegress(), GetSkRect().left(), GetSkRect().top());
+	canvas->rotate(GetDegress(), GetSkRect().left()+GetWidth()*anchor.fX, GetSkRect().top()+GetHeight()*anchor.fY);
 	canvas->drawImageRect(SpriteImage.get(), GetSkRect(), &paint);
 	canvas->restore();
 }
@@ -115,6 +116,11 @@ void Sprite::SetScaleX(SkScalar sx)
 void Sprite::SetScaleY(SkScalar sy)
 {
 	SetScale(1.0,sy);
+}
+
+void Sprite::SetAnchorPoint(SkPoint po)
+{
+	anchor = po;
 }
 
 

@@ -24,6 +24,8 @@ public:
 	void SetScaleX(SkScalar sx);
 	void SetScaleY(SkScalar sy);
 
+	void SetAnchorPoint(SkPoint po);
+
 	void SetOpacity(SkScalar op)
 	{
 		opacity = op;
@@ -32,4 +34,5 @@ private:
 	sk_sp<SkImage> SpriteImage;
 
 	SkScalar opacity;
+	SkPoint  anchor;
 };

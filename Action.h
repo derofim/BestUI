@@ -5,23 +5,8 @@
 #include "SkTime.h"
 #include <map>
 
-//SkTime
-//
-//class Action {
-//public:
-//	Action();
-//	void update();
-//
-//	void StopAction();
-//	void SetAction(double time);
-//private:
-//	double initstamp;
-//	double endstamp;
-//};
-//
 
 //
-
 //
 //
 ////Í¬Ê±Ö´ÐÐ
@@ -37,21 +22,7 @@
 //};
 //
 
-//
-//class MoveBy :public Action
-//{
-//
-//};
-//
 
-//
-//class Blink :public Action
-//{
-//public:
-//	Blink(double time,int nBlink);
-//private:
-//	int nTicks;
-//};
 
 
 typedef std::function<void(void)> ActCallBackFun;
@@ -65,12 +36,14 @@ public:
 		Stop
 	};
 	Action();
+
+	virtual Action *clone() { return 0; }
 	//void SetStopActionCallBack();
-	virtual void StartAction()=0;
-	virtual void StopAction()=0;
+	virtual void StartAction() {};
+	virtual void StopAction() {};
 
 
-	virtual void update() = 0;
+	virtual void update() {};
 
 	bool ActionIsStart();
 	void ReadyAction(double fDelayTime = 0);
@@ -131,26 +104,37 @@ class Sequence /*:public ActionManage*/
 {
 public:
 	Sequence(UIWidget *pUi, ActCallBackFun callback,...);
+	double RunSequence();
 	~Sequence();
 private:
 	ActionManage *pActionManage;
+	ActCallBackFun fun;
+	std::vector<Action *> list;
+	UIWidget *pWidget;
+	double fDelayTotal;
+	int nRef;
 	//RunAction()
 };
 
+class Repeat
+{
+public:
+	Repeat(UIWidget *pUi, Action *act,int nRep, ActCallBackFun callback=0);
+	Repeat(UIWidget *pUi, Sequence *seq, int nRep, ActCallBackFun callback = 0);
+	~Repeat() {};
+private:
+	ActionManage *pActionManage;
+	
+};
 
-//class Sequence2 :public Action {
-//public:
-//	Sequence2(Action *act1,...);
-//	void update() override {};
-//	void StopAction() override {};
-//	void StartAction() override {};
-//};
+
 
 
 class Blink :public Action
 {
 public:
 	Blink(double runtime, int nBlink);
+	virtual Blink *clone() { return  new Blink(*this); }
 	void StartAction() override;
 	void StopAction()override;
 	void update() override;
@@ -166,6 +150,7 @@ class MoveTo :public Action
 {
 public:
 	MoveTo(double runtime, SkScalar x, SkScalar y);
+	virtual MoveTo *clone() { return  new MoveTo(*this); }
 	void StartAction() override;
 	void StopAction()override;
 	void update() override;
@@ -184,6 +169,8 @@ class RotateTo :public Action
 {
 public:
 	RotateTo(double runtime, SkScalar degrees);
+
+	virtual RotateTo *clone() { return  new RotateTo(*this); }
 	void StartAction() override;
 	void StopAction()override;
 	void update() override;
@@ -195,6 +182,7 @@ class DelayTime :public Action
 {
 public:
 	DelayTime(double runtime, ActCallBackFun callback=0);
+	virtual DelayTime *clone() { return  new DelayTime(*this); }
 	void update() override;
 	void StopAction() override ;
 	void StartAction() override {};

@@ -117,10 +117,14 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	this->AddWidget(p);
 	p->SetPosition(300, 300);
 
-	/*RotateTo *ro = new RotateTo(5, 360);
-	p->RunAction(ro);*/
-	MoveTo *to = new MoveTo(2, 800, 500);
-	p->RunAction(to);
+	//p->SetAnchorPoint(SkPoint::Make(0.8, 0.8));
+	RotateTo *ro = new RotateTo(2, 360);
+	//p->RunAction(ro);
+
+
+	//Repeat re = Repeat(p, ro, 3, 0);
+	/*MoveTo *to = new MoveTo(2, 800, 500);
+	p->RunAction(to);*/
 	//p->RunAction(new DelayTime(10.2, [&](void){
 	//	  printf("kkkkk\n");
 	//	//  this->KillTimer(timer_sel(HelloWorld::TestTimer));
@@ -136,15 +140,17 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 
 	//new Sequence(p, de, pBlink, 0);
 
-	//Blink *pBlink = new Blink(2, 2);
-	//DelayTime *de = new DelayTime(2);
+	Blink *pBlink = new Blink(2, 2);
+	DelayTime *de = new DelayTime(2);
 
 	//Sequence se =  Sequence(p, [&](void) {
 	//	printf("kkkkk222222\n");
 	//	this->KillTimer(timer_sel(HelloWorld::TestTimer));
 	//},pBlink,de,0);
 
-	//Sequence *se=new Sequence(p, de, pBlink,0);
+	Sequence se=Sequence(p,0,ro, de, pBlink,0);
+    Repeat re = Repeat(p, &se, 3, 0);
+//	se.RunSequence();
 
 	
 	//p->RunAction(pBlink);
