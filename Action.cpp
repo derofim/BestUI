@@ -308,7 +308,22 @@ void ActionManage::UpdateAllAction()
 	}
 }
 
+void  ActionManage::StopAllAction(UIWidget *pWidget)
+{
+	for (auto iter = actionlist.begin(); iter != actionlist.end();)
+	{
+		if ((*iter)->GetWidget() == pWidget)
+		{
+			delete *iter;
+			iter = actionlist.erase(iter);
 
+		}
+		else
+		{
+			iter++;
+		}
+	}
+}
 
 void ActionManage::AddAction(Action *act, UIWidget *pWidget, double fDelayTime)
 {

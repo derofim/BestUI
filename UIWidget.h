@@ -58,6 +58,7 @@ public:
 	void SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
 
 	void RunAction(Action *type);
+	void StopAllAction();
 
 //	void RunSequence(ActCallBackFun callback, ...);
 

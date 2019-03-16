@@ -74,6 +74,7 @@ Sprite::Sprite(const char *pImagePath)
 
 Sprite::~Sprite()
 {
+	this->StopAllAction();
 	SpriteImage.get()->unref();
 	SpriteImage.release();
 }

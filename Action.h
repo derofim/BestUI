@@ -87,6 +87,7 @@ class ActionManage
 public:
 	ActionManage();
 	void AddAction(Action *act, UIWidget *pWidget,double fDelayTime=0);
+	void StopAllAction(UIWidget *pWidget);
 	void UpdateAllAction();
 private:
 	std::vector<Action *> actionlist;

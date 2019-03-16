@@ -29,6 +29,11 @@ void UIWidget::RunAction(Action *type)
 	GetActionManage()->AddAction(type, this);
 }
 
+void UIWidget::StopAllAction()
+{
+	GetActionManage()->StopAllAction(this);
+}
+
 //void UIWidget::RunSequence(ActCallBackFun callback, ...)
 //{
 //	Sequence(this, callback);
