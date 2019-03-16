@@ -98,18 +98,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 		UIWidget *pChild = *iter;
 		pChild->SetRect(pChild->GetSkRect().left()+diff_x, pChild->GetSkRect().top() + diff_y, pChild->GetWidth()+diff_x + pChild->GetSkRect().left(), pChild->GetSkRect().top() + pChild->GetHeight() + diff_y);
 
-	/*	if (nDirectionType == Direction::Vertical)
-		{
-			pChild->SetRect(pChild->GetSkRect().left(), pChild->GetSkRect().top() + diff_y, pChild->GetWidth() + pChild->GetSkRect().left(), pChild->GetSkRect().top() + pChild->GetHeight()+ diff_y);
-			
-		}
-		else if (nDirectionType == Direction::Horizontal)
-		{
-			pChild->SetRect(pChild->GetSkRect().left()+ diff_x, pChild->GetSkRect().top(), pChild->GetWidth() + diff_x + pChild->GetSkRect().left(), pChild->GetSkRect().top() + pChild->GetHeight());
-		}*/
 	}
-
-
 
 
 	ContentInfo.preoffs_y = ContentInfo.offs_y;
@@ -124,10 +113,6 @@ void ScrollView::Draw(SkCanvas* canvas)
 	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
-		if (nDirectionType == Direction::Vertical)
-		{
-
-		}
 		pChild->Draw(surfaceCanvas);
 	}
 	
@@ -173,9 +158,9 @@ void ScrollView::SetDirection(Direction nType)
 
 void ScrollView::JumpTop()
 {
-	/*if (nDirectionType == Direction::Vertical)
-		ContentInfo.offs = 0;
-	SetScrollOffs(ContentInfo.offs);*/
+	if (nDirectionType == Direction::Vertical)
+		ContentInfo.offs_y = 0;
+	this->RunAction(new ScrollTo(0, 0, ContentInfo.offs_y));
 }
 void ScrollView::JumpBottom()
 {
@@ -194,9 +179,25 @@ void ScrollView::JumpRight()
 {
 }
 
+void ScrollView::InitOffset()
+{
+	ContentInfo.offs_y = 0;
+	ContentInfo.preoffs_y = 0;
+	ContentInfo.offs_x = 0;
+	ContentInfo.preoffs_x = 0;
+}
+
 void ScrollView::RemoveAllChildWidget()
 {
+
+	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
+	{
+		UIWidget *pChild = *iter;
+		delete pChild;
+	}
 	childlist.clear();
+	InitOffset();
+
 }
 
 void ScrollView::AddChild(UIWidget *pWidget)

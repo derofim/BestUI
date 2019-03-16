@@ -72,6 +72,12 @@ Sprite::Sprite(const char *pImagePath)
 	anchor.set(0.5, 0.5);
 }
 
+Sprite::~Sprite()
+{
+	SpriteImage.get()->unref();
+	SpriteImage.release();
+}
+
 void Sprite::Draw(SkCanvas* canvas)
 {
 	if (IsVisible() == false)
@@ -98,10 +104,10 @@ void Sprite::SetScale(SkScalar sx, SkScalar sy)
 	scaled.alloc(info);
 
 	SpriteImage->scalePixels(scaled, kHigh_SkFilterQuality, SkImage::kDisallow_CachingHint);
-
-	delete SpriteImage.get();
-	//不知道会不会内存泄漏
-	SpriteImage = SkImage::MakeRasterCopy(scaled);
+	SpriteImage.reset(SkImage::MakeRasterCopy(scaled).get());
+	//delete SpriteImage.get();
+	////不知道会不会内存泄漏
+	//SpriteImage = SkImage::MakeRasterCopy(scaled);
 	SetSize(SpriteImage->width(), SpriteImage->height());
 }
 

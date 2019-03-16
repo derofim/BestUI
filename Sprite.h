@@ -14,6 +14,7 @@
 class Sprite :public UIWidget {
 public:
 	Sprite(const char *pImagePath);
+	~Sprite();
 
 	void Draw(SkCanvas* canvas);
 	void OnMouseMove(int x, int y) override;

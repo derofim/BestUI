@@ -53,6 +53,8 @@ public:
 
 	void SetBackGroundColor(SkColor color);
 
+	void InitOffset();
+
 private:
 	std::vector<sk_sp<SkImage>> imagelist;
 	/*SkScalar offs;

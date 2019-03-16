@@ -15,6 +15,7 @@
 class Button :public UIWidget {
 public:
 	Button();
+	 ~Button() {};
 	void SetEnable(bool bEnable);
 	void SetText(const char *pText);
 	enum {
@@ -43,7 +44,7 @@ private:
 class ButtonImage :public Button{
 public:
 	ButtonImage(const char *pNormalPath,const char *pPressedPath=0,const char *pDisabledPath=0);
-
+	 ~ButtonImage() {};
 	void SetButtonImageNormal(const char *pImagePath);
 	void SetButtonImagePressed(const char *pImagePath);
 	void SetButtonImageDisabled(const char *pImagePath);

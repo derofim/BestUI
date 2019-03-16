@@ -50,6 +50,7 @@ private:
 class UIWidget :public UIShard{
 public:
 	UIWidget();
+	virtual ~UIWidget() {};
 	int nShowOrder;
 	virtual void Draw(SkCanvas* canvas)=0;
 	void SetPosition(SkScalar x, SkScalar y);
