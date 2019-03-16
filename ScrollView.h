@@ -18,7 +18,10 @@
 struct ScrollContentInfo {
 	SkScalar width;
 	SkScalar height;
-	SkScalar offs;
+	SkScalar offs_y;
+	SkScalar preoffs_y;
+	SkScalar offs_x;
+	SkScalar preoffs_x;
 };
 
 class ScrollView :public UIWidget {
@@ -42,8 +45,13 @@ public:
 	void JumpLeft();
 	void JumpRight();
 
+	void SetContentSize(SkScalar width, SkScalar height);
+
 	void SetDirection(Direction nType);
 	
+	void RemoveAllChildWidget();
+
+	void SetBackGroundColor(SkColor color);
 
 private:
 	std::vector<sk_sp<SkImage>> imagelist;
@@ -53,5 +61,6 @@ private:
 	ScrollContentInfo ContentInfo;
 
 	std::vector<UIWidget *> childlist;
+	SkColor background;
 
 };

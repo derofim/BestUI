@@ -4,8 +4,9 @@ UIWidget::UIWidget()
 {
 	callbackf = NULL;
 	SetVisible(true);
-	pActionManage = gActionManage;
 	fDegress = 0;
+	SetScrolloffsX(0);
+	SetScrolloffsY(0);
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {
@@ -25,7 +26,7 @@ void UIWidget::SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bot
 
 void UIWidget::RunAction(Action *type)
 {
-	pActionManage->AddAction(type, this);
+	GetActionManage()->AddAction(type, this);
 }
 
 //void UIWidget::RunSequence(ActCallBackFun callback, ...)
@@ -53,3 +54,32 @@ void UIWidget::SetUiEventCallBack(CallBackFun fu)
 //{
 //	OnMouseMove(x, y);
 //}
+
+
+UIShard::UIShard()
+{
+	pActionManage = gActionManage;
+	pTimerManage = gTimerManage;
+	pWidgetList = &gWidgetList;
+}
+
+void UIShard::RunAction(Action *type)
+{
+	pActionManage->AddAction(type, 0);
+}
+
+void UIShard::AddWidget(UIWidget *pWidget, int nShowOrder)
+{
+	pWidget->nShowOrder = nShowOrder;
+	pWidgetList->push_back(pWidget);
+}
+
+void UIShard::SetTimer(TimerCallBackFun fun, double fElapse)
+{
+	pTimerManage->SetTimer(this, fun, fElapse);
+}
+
+void UIShard::KillTimer(TimerCallBackFun fun)
+{
+	pTimerManage->KillTimer(fun);
+}

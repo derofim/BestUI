@@ -74,6 +74,8 @@ Sprite::Sprite(const char *pImagePath)
 
 void Sprite::Draw(SkCanvas* canvas)
 {
+	if (IsVisible() == false)
+		return;
 	SkPaint paint;
 	paint.setAlpha(opacity*255);
 

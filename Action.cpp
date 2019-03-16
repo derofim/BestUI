@@ -34,6 +34,41 @@ void Blink::update()
 	}
 }
 
+ScrollTo::ScrollTo(double runtime, SkScalar x, SkScalar y)
+{
+	SetRunTime(runtime);
+	move_x = x;
+	move_y = y;
+}
+
+void ScrollTo::StartAction()
+{
+	init_y = GetWidget()->GetScrolloffsY();
+	range_y = init_y - move_y;
+
+	init_x = GetWidget()->GetScrolloffsX();
+	range_x = init_x - move_x;
+}
+void ScrollTo::StopAction()
+{
+	GetWidget()->SetScrolloffsY(move_y);
+}
+void ScrollTo::update()
+{
+	if (ActionIsStart() == false)
+		return;
+	double curstamp = SkTime::GetMSecs();
+	double rate = (curstamp - GetInitStamp()) / GetRunTime();
+
+	SkScalar offs_y = init_y - range_y * rate;
+	GetWidget()->SetScrolloffsY(offs_y);
+
+	SkScalar offs_x = init_x - range_x * rate;
+	GetWidget()->SetScrolloffsX(offs_x);
+	//GetWidget()->SetScrollOffs(move_y-rate)
+	
+}
+
 MoveTo::MoveTo(double runtime, SkScalar x, SkScalar y)
 {
 	SetRunTime(runtime);

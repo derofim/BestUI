@@ -2,18 +2,19 @@
 #include <algorithm>
 using namespace std;
 
-void UIRoot::AddWidget(UIWidget *pWidget, int nShowOrder)
-{
-	pWidget->nShowOrder = nShowOrder;
-	widgetlist.push_back(pWidget);
-	
-}
+//void UIRoot::AddWidget(UIWidget *pWidget, int nShowOrder)
+//{
+//	pWidget->nShowOrder = nShowOrder;
+//	widgetlist.push_back(pWidget);
+//	
+//}
 
 void UIRoot::DrawAllWidget(SkCanvas* canvas)
 {
-	sort(widgetlist.begin(), widgetlist.end(), [](UIWidget *x, UIWidget *y) {return x->nShowOrder < y->nShowOrder; });
+	
+	sort(GetWidgetList()->begin(), GetWidgetList()->end(), [](UIWidget *x, UIWidget *y) {return x->nShowOrder < y->nShowOrder; });
 
-	for (auto iter = widgetlist.begin(); iter != widgetlist.end(); iter++)
+	for (auto iter = GetWidgetList()->begin(); iter != GetWidgetList()->end(); iter++)
 	{
 		DrawWidget(canvas,*iter);
 	}
@@ -31,9 +32,9 @@ void UIRoot::DrawWidget(SkCanvas* canvas,UIWidget *pWidget)
 
 void UIRoot::OnMouseDown(int x, int y)
 {
-	if (widgetlist.size() == 0)
+	if (GetWidgetList()->size() == 0)
 		return;
-	for (auto iter = widgetlist.end()-1; ;iter--)
+	for (auto iter = GetWidgetList()->end()-1; ;iter--)
 	{
 		UIWidget *pWidget = *iter;
 		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom() && pWidget->IsVisible())
@@ -49,39 +50,16 @@ void UIRoot::OnMouseDown(int x, int y)
 
 void  UIRoot::OnMouseMove(int x, int y)
 {
-	if (widgetlist.size() == 0)
+	if (GetWidgetList()->size() == 0)
 		return;
-	for (auto iter = widgetlist.end() - 1; ; iter--)
+	for (auto iter = GetWidgetList()->end() - 1; ; iter--)
 	{
 		UIWidget *pWidget = *iter;
 		pWidget->OnMouseMove(x, y);
 		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom())
 			return;
-		if (iter == widgetlist.begin())
+		if (iter == GetWidgetList()->begin())
 			break;
 	}
 }
 
-
-UIShard::UIShard()
-{
-	gActionManage = new ActionManage();
-	gTimerManage = new GameTimerManage();
-	pActionManage = gActionManage;
-	pTimerManage =  gTimerManage;
-}
-
-void UIShard::RunAction(Action *type)
-{
-	pActionManage->AddAction(type, 0);
-}
-
-void UIShard::SetTimer(TimerCallBackFun fun, double fElapse)
-{
-	pTimerManage->SetTimer(this,fun, fElapse);
-}
-
-void UIShard::KillTimer(TimerCallBackFun fun)
-{
-	pTimerManage->KillTimer(fun);
-}

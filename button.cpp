@@ -18,6 +18,8 @@ ButtonImage::ButtonImage(const char *pNormalPath, const char *pPressedPath, cons
 	SetButtonImagePressed(pPressedPath == 0 ? pNormalPath : pPressedPath);
 	SetButtonImageDisabled(pDisabledPath == 0 ? pNormalPath : pDisabledPath);
 
+	
+
 
 
 }
@@ -27,7 +29,7 @@ void ButtonImage::SetButtonImageNormal(const char *pImagePath)
 	sk_sp<SkData> blob = SkData::MakeFromFileName(pImagePath);
 	if (blob == NULL) return;
 	NormalImage = SkImage::MakeFromEncoded(blob);
-	
+	SetSize(NormalImage->width(), NormalImage->height());
 }
 
 void ButtonImage::SetButtonImagePressed(const char *pImagePath)
@@ -50,6 +52,8 @@ void ButtonImage::SetButtonImageDisabled(const char *pImagePath)
 
 void ButtonImage::Draw(SkCanvas* canvas)
 {
+	if (IsVisible() == false)
+		return;
 	if (GetSkRect().right() == 0 || GetSkRect().bottom() == 0)
 	{
 		SetSize(NormalImage->width(), NormalImage->height());
@@ -91,6 +95,8 @@ void Button::SetEnable(bool bEnable)
 
 void Button::Draw(SkCanvas* canvas)
 {
+	if (IsVisible() == false)
+		return;
 	SkFont font;
 	font.setSubpixel(true);
 	font.setSize(16);

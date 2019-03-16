@@ -15,12 +15,7 @@
 //public:
 //};
 //
-////÷ÿ∏¥÷¥––
-//class Repeat
-//{
-//public:
-//};
-//
+
 
 
 
@@ -162,6 +157,24 @@ private:
 	SkScalar init_x;
 	SkScalar init_y;
 
+};
+
+
+class ScrollTo :public Action
+{
+public:
+	ScrollTo(double runtime, SkScalar x,SkScalar y);
+	virtual ScrollTo *clone() { return  new ScrollTo(*this); }
+	void StartAction() override;
+	void StopAction()override;
+	void update() override;
+private:
+	SkScalar move_x;
+	SkScalar move_y;
+	SkScalar range_x;
+	SkScalar range_y;
+	SkScalar init_x;
+	SkScalar init_y;
 };
 
 

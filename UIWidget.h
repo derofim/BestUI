@@ -8,6 +8,7 @@
 #include "SkGraphics.h"
 #include "SkImage.h"
 #include "Action.h"
+#include "GameTimer.h"
 
 class Action;
 
@@ -16,7 +17,37 @@ extern  ActionManage *gActionManage;
 class UIWidget;
 typedef std::function<void(UIWidget *p)> CallBackFun;
 
-class UIWidget {
+
+
+extern  ActionManage *gActionManage;
+extern  GameTimerManage *gTimerManage;
+extern std::vector<UIWidget *> gWidgetList;
+class UIShard {
+public:
+	UIShard();
+	void RunAction(Action *type);
+	void AddWidget(UIWidget *pWidget, int nShowOrder=0);
+	void SetTimer(TimerCallBackFun fun, double fElapse);
+	void KillTimer(TimerCallBackFun fun);
+	ActionManage *GetActionManage()
+	{
+		return pActionManage;
+	}
+	GameTimerManage *GetTimerManage()
+	{
+		return pTimerManage;
+	}
+	std::vector<UIWidget *> * GetWidgetList()
+	{
+		return pWidgetList;
+	}
+private:
+	ActionManage *pActionManage;
+	GameTimerManage *pTimerManage;
+	std::vector<UIWidget *> *pWidgetList;
+};
+
+class UIWidget :public UIShard{
 public:
 	UIWidget();
 	int nShowOrder;
@@ -56,6 +87,10 @@ public:
 	{
 		nTag = nSet;
 	}
+	int GetTag()
+	{
+		return nTag;
+	}
 	bool IsVisible()
 	{
 		return bShowWindow;
@@ -74,12 +109,34 @@ public:
 		fDegress = degress;
 	}
 
+	SkScalar GetScrolloffsY()
+	{
+		return fScrolloffsY;
+	}
+
+	void SetScrolloffsY(SkScalar offs)
+	{
+		fScrolloffsY = offs;
+	}
+
+	SkScalar GetScrolloffsX()
+	{
+		return fScrolloffsX;
+	}
+
+	void SetScrolloffsX(SkScalar offs)
+	{
+		fScrolloffsX = offs;
+	}
+
 private:
 	//SkPoint point;
-	ActionManage *pActionManage;
 	SkRect rect;
 	CallBackFun callbackf;
 	int nTag;
 	bool bShowWindow;
 	SkScalar fDegress;
+
+	SkScalar fScrolloffsY;
+	SkScalar fScrolloffsX;
 };
