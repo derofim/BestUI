@@ -32,6 +32,8 @@ public:
 	void UpdateAllGameTimer();
 	void SetTimer(UIShard *target, TimerCallBackFun fun, double fElapse);
 	void KillTimer(TimerCallBackFun fun);
+
+	bool IsTimerRuning(TimerCallBackFun fun);
 private:
 	//std::map<TimerCallBackFun, GameTimer *> timerlist;
 

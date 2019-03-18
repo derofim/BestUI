@@ -16,7 +16,10 @@ public:
 
 	void OnMouseDown(int x, int y);
 	void OnMouseMove(int x, int y);
+
+	void OnMouseWheel(float delta, uint32_t modifiers);
+
 private:
-	std::vector<UIWidget *> widgetlist;
+	//std::vector<UIWidget *> widgetlist;
 };
 

@@ -42,7 +42,7 @@ void UIRoot::OnMouseDown(int x, int y)
 			pWidget->OnMouseDown(x, y);
 			return;
 		}
-		if (iter == widgetlist.begin())
+		if (iter == GetWidgetList()->begin())
 			break;
 	}
 }
@@ -63,3 +63,7 @@ void  UIRoot::OnMouseMove(int x, int y)
 	}
 }
 
+void  UIRoot::OnMouseWheel(float delta, uint32_t modifier)
+{
+
+}

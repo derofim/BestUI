@@ -43,7 +43,10 @@ void GameTimerManage::SetTimer(UIShard *target, TimerCallBackFun fun, double fEl
 {
 	GameTimer *pTimer = new GameTimer();
 	pTimer->SetTimer(target, fun, fElapse);
-	timerlist.push_back(pTimer);
+	if (IsTimerRuning(fun) == false)
+	{
+		timerlist.push_back(pTimer);
+	}
 
 	//char *pAddress = (char *)fun;
 	/*auto it = timerlist.find(target->*fun);
@@ -71,6 +74,17 @@ void GameTimerManage::UpdateAllGameTimer()
 			iter++;
 		}
 	}
+}
+
+
+bool GameTimerManage::IsTimerRuning(TimerCallBackFun fun)
+{
+	for (auto iter = timerlist.begin(); iter != timerlist.end(); iter++)
+	{
+		if ((*iter)->GetCallBackFun() == fun)
+			return true;
+	}
+	return false;
 }
 
 void GameTimerManage::KillTimer(TimerCallBackFun fun)

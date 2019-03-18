@@ -11,9 +11,8 @@
 #include "SkSurface.h"
 #include <vector>
 #include "UIRoot.h"
-//#include "button.h"
+#include "ScrollBar.h"
 
-//SkSurface
 
 struct ScrollContentInfo {
 	SkScalar width;
@@ -27,15 +26,14 @@ struct ScrollContentInfo {
 class ScrollView :public UIWidget {
 public:
 
-	enum Direction {
-		Vertical,
-		Horizontal
-	};
+	
 	ScrollView();
 
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
+
+	void OnMouseWheel(float delta, uint32_t modifier) override;
 
 //	void AddChild(char *pImagePath);
 	void AddChild(UIWidget *pWidget);
@@ -64,5 +62,8 @@ private:
 
 	std::vector<UIWidget *> childlist;
 	SkColor background;
+
+	ScrollBar *vert_bar;
+	ScrollBar *hori_bar;
 
 };

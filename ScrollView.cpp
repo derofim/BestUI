@@ -8,6 +8,9 @@ ScrollView::ScrollView()
 	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
 
 	background = SkColorSetRGB(255, 255, 255);
+	vert_bar=NULL;
+	hori_bar=NULL;
+
 }
 
 //void ScrollView::Draw(SkCanvas* canvas)
@@ -115,6 +118,16 @@ void ScrollView::Draw(SkCanvas* canvas)
 		UIWidget *pChild = *iter;
 		pChild->Draw(surfaceCanvas);
 	}
+
+	if (vert_bar != NULL)
+	{
+		ScrollBarInfo barinfo;
+		barinfo.ContentSize=ContentInfo.height;
+		barinfo.DisplaySize=GetSkRect().height();
+		barinfo.offset=ContentInfo.offs_y;
+		vert_bar->SetScrollBarInfo(barinfo);
+		vert_bar->Draw(surfaceCanvas);
+	}
 	
 	sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
 	canvas->drawImage(image, GetSkRect().left(), GetSkRect().top());
@@ -149,6 +162,12 @@ void  ScrollView::OnMouseDown(int x, int y)
 		}
 		
 	}
+}
+
+
+void ScrollView::OnMouseWheel(float delta, uint32_t modifier)
+{
+
 }
 
 void ScrollView::SetDirection(Direction nType)
@@ -210,12 +229,41 @@ void ScrollView::SetContentSize(SkScalar width, SkScalar height)
 {
 	ContentInfo.height = height;
 	ContentInfo.width = width;
+
+	if (ContentInfo.height > GetSkRect().height())
+	{
+		if (vert_bar == NULL)
+		{
+			vert_bar = new ScrollBar(Direction::Vertical);
+			vert_bar->SetPosition(GetSkRect().width()-10,0);
+			vert_bar->SetSize(10,GetSkRect().height());
+		}
+
+		ScrollBarInfo barinfo;
+		barinfo.ContentSize=ContentInfo.height;
+		barinfo.DisplaySize=GetSkRect().height();
+		barinfo.offset=0;
+		vert_bar->SetScrollBarInfo(barinfo);
+
+		//childlist.push_back(vert_bar);
+		
+	}
+	else
+	{
+		if (vert_bar != NULL)
+		{
+			delete vert_bar;
+			vert_bar=NULL;
+		}
+	}
 }
 
 void ScrollView::SetBackGroundColor(SkColor color)
 {
 	background = color;
 }
+
+
 
 
 //void  ScrollView::AddChild(char *pImagePath)
