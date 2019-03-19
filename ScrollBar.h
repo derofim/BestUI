@@ -8,6 +8,17 @@ enum Direction {
 };
 
 
+class ScrollBar;
+
+class  ScrollBarController {
+ public:
+  virtual void ScrollToPosition(ScrollBar* source, int position) = 0;
+  //virtual int GetScrollIncrement(ScrollBar* source,
+  //                               bool is_page,
+  //                               bool is_positive) = 0;
+};
+
+
 struct ScrollBarInfo{
 	SkScalar ContentSize;
 	SkScalar DisplaySize;
@@ -26,16 +37,42 @@ public:
     SCROLL_NEXT_PAGE,
    };
 
+	enum ThumbStatu{
+		NormalStatu,
+		MouseStayStatu,
+		MousePressedStatu,
+		DisabledStatu,
+	};
+
 	ScrollBar(Direction dir);
 	~ScrollBar();
 	void SetScrollBarInfo(ScrollBarInfo info);
 
 	//void SetOffset(SkScalar off)
 	void Draw(SkCanvas* canvas) override;
-	void OnMouseMove(int x, int y) override {};
-	void OnMouseDown(int x, int y) override {};
+	void OnMouseMove(int x, int y) override ;
+	void OnMouseDown(int x, int y) override ;
+	void OnMouseUp(int x,int y) override;
 
 	void OnMouseWheel(float delta, uint32_t modifier) override {};
+
+	SkScalar GetThumbSize();
+	SkScalar GetThumbPosition();
+
+	void set_controller(ScrollBarController* controller) {
+       scrollbar_controller = controller;
+    }
+	ScrollBarController* GetScrollBarController()  { 
+		return scrollbar_controller; 
+	}
 private:
 	ScrollBarInfo barinfo;
+	Direction nDirectionType;
+	SkRect thumbrect;
+
+	ThumbStatu thumbst;
+	int mouse_offset;
+	int offset_reset;
+    ScrollBarController* scrollbar_controller;
+
 };

@@ -26,6 +26,8 @@ public:
     bool onChar(SkUnichar c, uint32_t modifiers) override;
 	bool onMouse(int x, int y, sk_app::Window::InputState state, uint32_t modifiers) override;
 
+	bool onMouseWheel(float delta, uint32_t modifiers) override;
+
 	void ClickCallback(UIWidget *pWidget);
 	void TestTimer();
 	void TestTimer2();

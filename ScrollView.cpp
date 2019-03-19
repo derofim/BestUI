@@ -142,6 +142,13 @@ void ScrollView::OnMouseMove(int x, int y)
 		int child_y = y - GetSkRect().top();
 		pChild->OnMouseMove(child_x, child_y);
 	}
+
+	if (vert_bar != NULL)
+	{
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		vert_bar->OnMouseMove(child_x, child_y);
+	}
 }
 
 void  ScrollView::OnMouseDown(int x, int y)
@@ -162,12 +169,48 @@ void  ScrollView::OnMouseDown(int x, int y)
 		}
 		
 	}
+
+	if (vert_bar != NULL)
+	{
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		vert_bar->OnMouseDown(child_x, child_y);
+	}
 }
 
 
+void ScrollView::OnMouseUp(int x, int y)
+{
+	if (vert_bar != NULL)
+	{
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		vert_bar->OnMouseUp(child_x, child_y);
+	}
+}
+
 void ScrollView::OnMouseWheel(float delta, uint32_t modifier)
 {
+	//printf("OnMouseWheel delta=%f,modifier=%d\n",delta,modifier);
+	SkScalar pos_y;
+	if (delta > 0)
+		pos_y=std::min((float)0,GetScrolloffsY()+delta*10);
+		
+	else
+		pos_y=std::max((float)(-(ContentInfo.height - GetHeight())),GetScrolloffsY()+delta*10);
+	SetScrolloffsY(pos_y);
+}
 
+
+void ScrollView::ScrollToPosition(ScrollBar* source, int position)
+{
+	if (source == vert_bar)
+	{
+		SkScalar pos_y=position;
+	/*	pos_y=std::min((float)0,(float)position);
+		pos_y=std::max((float)(-(ContentInfo.height - GetHeight())),(float)position);*/
+		SetScrolloffsY(pos_y);
+	}
 }
 
 void ScrollView::SetDirection(Direction nType)
@@ -235,6 +278,7 @@ void ScrollView::SetContentSize(SkScalar width, SkScalar height)
 		if (vert_bar == NULL)
 		{
 			vert_bar = new ScrollBar(Direction::Vertical);
+			vert_bar->set_controller(this);
 			vert_bar->SetPosition(GetSkRect().width()-10,0);
 			vert_bar->SetSize(10,GetSkRect().height());
 		}

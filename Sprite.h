@@ -19,6 +19,7 @@ public:
 	void Draw(SkCanvas* canvas);
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
+	void OnMouseUp(int x, int y) override {};
 	void OnMouseWheel(float delta, uint32_t modifier) override {};
 
 	void SetScale(SkScalar scale);

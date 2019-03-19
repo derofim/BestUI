@@ -36,6 +36,7 @@ public:
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
+	void OnMouseUp(int x,int y) override;
 	void OnMouseWheel(float delta, uint32_t modifier) override {};
 private:
 	int nButState;

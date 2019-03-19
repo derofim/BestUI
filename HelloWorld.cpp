@@ -27,7 +27,9 @@ using namespace sk_app;
  GameTimerManage *gTimerManage;
 Application* Application::Create(int argc, char** argv, void* platformData) {
 
-
+	gActionManage = new ActionManage();
+	gTimerManage = new GameTimerManage();
+	gWidgetList.clear();
 	return new HelloWorld(argc, argv, platformData);
 
 	//std::max();
@@ -221,5 +223,15 @@ bool HelloWorld::onMouse(int x, int y, Window::InputState state, uint32_t modifi
 	{
 		OnMouseMove(x, y);
 	}
+	else if (Window::kUp_InputState == state)
+	{
+		OnMouseUp(x,y);
+	}
+	return true;
+}
+
+bool HelloWorld::onMouseWheel(float delta, uint32_t modifiers)
+{
+	OnMouseWheel(delta,modifiers);
 	return true;
 }

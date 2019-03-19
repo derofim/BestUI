@@ -23,7 +23,7 @@ struct ScrollContentInfo {
 	SkScalar preoffs_x;
 };
 
-class ScrollView :public UIWidget {
+class ScrollView :public UIWidget,public ScrollBarController {
 public:
 
 	
@@ -32,7 +32,7 @@ public:
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
-
+	void OnMouseUp(int x,int y) override;
 	void OnMouseWheel(float delta, uint32_t modifier) override;
 
 //	void AddChild(char *pImagePath);
@@ -52,6 +52,8 @@ public:
 	void SetBackGroundColor(SkColor color);
 
 	void InitOffset();
+
+	void ScrollToPosition(ScrollBar* source, int position);
 
 private:
 	std::vector<sk_sp<SkImage>> imagelist;

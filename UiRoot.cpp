@@ -48,6 +48,24 @@ void UIRoot::OnMouseDown(int x, int y)
 }
 
 
+void UIRoot::OnMouseUp(int x, int y)
+{
+	if (GetWidgetList()->size() == 0)
+		return;
+	for (auto iter = GetWidgetList()->end()-1; ;iter--)
+	{
+		UIWidget *pWidget = *iter;
+		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom() && pWidget->IsVisible())
+		{
+			pWidget->OnMouseUp(x, y);
+			return;
+		}
+		if (iter == GetWidgetList()->begin())
+			break;
+	}
+}
+
+
 void  UIRoot::OnMouseMove(int x, int y)
 {
 	if (GetWidgetList()->size() == 0)
@@ -65,5 +83,15 @@ void  UIRoot::OnMouseMove(int x, int y)
 
 void  UIRoot::OnMouseWheel(float delta, uint32_t modifier)
 {
-
+	if (GetWidgetList()->size() == 0)
+		return;
+	for (auto iter = GetWidgetList()->end() - 1; ; iter--)
+	{
+		UIWidget *pWidget = *iter;
+		pWidget->OnMouseWheel(delta, modifier);
+		/*if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom())
+			return;*/
+		if (iter == GetWidgetList()->begin())
+			break;
+	}
 }

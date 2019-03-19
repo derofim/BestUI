@@ -16,6 +16,7 @@ public:
 
 	void OnMouseDown(int x, int y);
 	void OnMouseMove(int x, int y);
+	void OnMouseUp(int x,int y);
 
 	void OnMouseWheel(float delta, uint32_t modifiers);
 

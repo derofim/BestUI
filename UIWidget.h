@@ -64,6 +64,7 @@ public:
 
 	virtual void OnMouseDown(int x, int y)=0;
 	virtual void OnMouseMove(int x, int y)=0;
+	virtual void OnMouseUp(int x,int y)=0;
 	virtual void OnMouseWheel(float delta, uint32_t modifier)=0;
 
 	void SetUiEventCallBack(CallBackFun fu);

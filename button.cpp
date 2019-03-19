@@ -137,3 +137,8 @@ void Button::OnMouseMove(int x, int y)
 	else
 		nButState = but_NormalStatu;
 }
+
+void Button::OnMouseUp(int x, int y)
+{
+
+}
