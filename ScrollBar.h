@@ -65,6 +65,15 @@ public:
 	ScrollBarController* GetScrollBarController()  { 
 		return scrollbar_controller; 
 	}
+
+	void SetMouseDragged(bool bValue){
+		bMouseDragged=bValue;
+	}
+
+	bool GetMouseDragged()
+	{
+		return bMouseDragged;
+	}
 private:
 	ScrollBarInfo barinfo;
 	Direction nDirectionType;
@@ -72,7 +81,8 @@ private:
 
 	ThumbStatu thumbst;
 	int mouse_offset;
-	int offset_reset;
+	//int offset_reset;
+	bool bMouseDragged;
     ScrollBarController* scrollbar_controller;
 
 };

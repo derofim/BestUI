@@ -5,7 +5,7 @@ ScrollBar::ScrollBar(Direction dir)
 {
 	nDirectionType=dir;
 	thumbst=ThumbStatu::NormalStatu;
-	offset_reset=true;
+	SetMouseDragged(false);
 }
 
 ScrollBar::~ScrollBar()
@@ -47,7 +47,7 @@ void ScrollBar::Draw(SkCanvas* canvas)
 	if(nDirectionType==Direction::Vertical)
 	   thumbrect.set(GetSkRect().left(),GetSkRect().top()+ThumbPos,GetWidth()+GetSkRect().left(),GetThumbSize()+GetSkRect().top()+ThumbPos);
 	else if(nDirectionType==Direction::Horizontal)
-		 thumbrect.set(GetSkRect().left()+ThumbPos, GetSkRect().top(), GetSkRect().left()+ThumbPos+GetThumbSize(),GetSkRect().height());
+		 thumbrect.set(GetSkRect().left()+ThumbPos, GetSkRect().top(), GetSkRect().left()+ThumbPos+GetThumbSize(),GetSkRect().top()+GetSkRect().height());
 	canvas->drawRect(thumbrect,paint);
 	/*if(nDirectionType==Direction::Vertical)
 	   canvas->drawRect(SkRect{  },paint);
@@ -61,37 +61,60 @@ void ScrollBar::OnMouseMove(int x, int y)
 	{
 		thumbst=ThumbStatu::MouseStayStatu;
 	}
-	else 
-		thumbst=ThumbStatu::NormalStatu;
-
-	if (offset_reset == false)
+	else
 	{
+		thumbst = ThumbStatu::NormalStatu;
+	}
+
+	if (GetMouseDragged())
+	{
+		if (nDirectionType == Direction::Vertical)
+		{
+			if (x >= thumbrect.left() - 80 && x <= thumbrect.right() + 80 && y >= thumbrect.top() && y <= thumbrect.bottom())
+				thumbst = ThumbStatu::MousePressedStatu;
+			else
+				return;
+		}
+		else if (nDirectionType == Direction::Horizontal)
+		{
+			if (x >= thumbrect.left()&& x <= thumbrect.right()  && y >= thumbrect.top()-50 && y <= thumbrect.bottom()+50)
+				thumbst = ThumbStatu::MousePressedStatu;
+			else
+				return;
+		}
+	}
+
+	if (GetMouseDragged())
+	{
+		int nMousePos=x;
+	    if(nDirectionType==Direction::Vertical)
+		    nMousePos=y;
 		thumbst=ThumbStatu::MousePressedStatu;
-		int thumb_y =  mouse_offset-y;
-		printf("thumb_y2=%d\n",y);
-		GetScrollBarController()->ScrollToPosition(this,thumb_y*barinfo.ContentSize/GetHeight());
+		int thumb_move =  mouse_offset-nMousePos;
+		printf("thumb_y2=%d\n",nMousePos);
+		if(nDirectionType==Direction::Vertical)
+		   GetScrollBarController()->ScrollToPosition(this,thumb_move*barinfo.ContentSize/GetHeight());
+		else if (nDirectionType == Direction::Horizontal)
+			GetScrollBarController()->ScrollToPosition(this,thumb_move*barinfo.ContentSize/GetWidth());
 	}
 }
 
 void ScrollBar::OnMouseDown(int x, int y)
 {
-	if (offset_reset == true)
+	int nMousePos=x;
+	if(nDirectionType==Direction::Vertical)
+		nMousePos=y;
+	if (GetMouseDragged()==false)
 	{
-		mouse_offset=y;
+		mouse_offset=nMousePos+(-GetThumbPosition());
 		printf("mouse_offset=%d\n",y);
-		offset_reset=false;
+		SetMouseDragged(true);
 	}
-	/*if ((x >= thumbrect.left() && x <= thumbrect.right() && y >= thumbrect.top() && y <= thumbrect.bottom()) || offset_reset==false)
-	{
-		thumbst=ThumbStatu::MousePressedStatu;
-		int thumb_y =  mouse_offset-y;
-		printf("thumb_y=%d\n",y);
-		GetScrollBarController()->ScrollToPosition(this,thumb_y);
-	}*/
+	
 }
 
 void ScrollBar::OnMouseUp(int x, int y)
 {
 	printf("mouse up=%d\n",y);
-	offset_reset=true;
+	SetMouseDragged(false);
 }

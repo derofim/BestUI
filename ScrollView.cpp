@@ -128,6 +128,16 @@ void ScrollView::Draw(SkCanvas* canvas)
 		vert_bar->SetScrollBarInfo(barinfo);
 		vert_bar->Draw(surfaceCanvas);
 	}
+
+	if (hori_bar != NULL)
+	{
+		ScrollBarInfo barinfo;
+		barinfo.ContentSize=ContentInfo.width;
+		barinfo.DisplaySize=GetSkRect().width();
+		barinfo.offset=ContentInfo.offs_x;
+		hori_bar->SetScrollBarInfo(barinfo);
+		hori_bar->Draw(surfaceCanvas);
+	}
 	
 	sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
 	canvas->drawImage(image, GetSkRect().left(), GetSkRect().top());
@@ -148,6 +158,13 @@ void ScrollView::OnMouseMove(int x, int y)
 		int child_x = x - GetSkRect().left();
 		int child_y = y - GetSkRect().top();
 		vert_bar->OnMouseMove(child_x, child_y);
+	}
+
+	if (hori_bar != NULL)
+	{
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		hori_bar->OnMouseMove(child_x, child_y);
 	}
 }
 
@@ -176,6 +193,13 @@ void  ScrollView::OnMouseDown(int x, int y)
 		int child_y = y - GetSkRect().top();
 		vert_bar->OnMouseDown(child_x, child_y);
 	}
+
+	if (hori_bar != NULL)
+	{
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		hori_bar->OnMouseDown(child_x, child_y);
+	}
 }
 
 
@@ -187,29 +211,48 @@ void ScrollView::OnMouseUp(int x, int y)
 		int child_y = y - GetSkRect().top();
 		vert_bar->OnMouseUp(child_x, child_y);
 	}
+
+	if (hori_bar != NULL)
+	{
+		int child_x = x - GetSkRect().left();
+		int child_y = y - GetSkRect().top();
+		hori_bar->OnMouseUp(child_x, child_y);
+	}
 }
 
 void ScrollView::OnMouseWheel(float delta, uint32_t modifier)
 {
 	//printf("OnMouseWheel delta=%f,modifier=%d\n",delta,modifier);
-	SkScalar pos_y;
-	if (delta > 0)
-		pos_y=std::min((float)0,GetScrolloffsY()+delta*10);
-		
-	else
-		pos_y=std::max((float)(-(ContentInfo.height - GetHeight())),GetScrolloffsY()+delta*10);
-	SetScrolloffsY(pos_y);
+	if(vert_bar==NULL)
+		return;
+	ScrollToPosition(vert_bar,GetScrolloffsY()+delta*10);
 }
 
 
 void ScrollView::ScrollToPosition(ScrollBar* source, int position)
 {
+	if(source==NULL)
+		return;
 	if (source == vert_bar)
 	{
 		SkScalar pos_y=position;
-	/*	pos_y=std::min((float)0,(float)position);
-		pos_y=std::max((float)(-(ContentInfo.height - GetHeight())),(float)position);*/
+
+		printf("scroll before pos=%f\n",pos_y);
+		pos_y=std::min((float)0,(float)pos_y);
+		pos_y=std::max((float)(-(ContentInfo.height - GetHeight())),(float)pos_y);
+		printf("scroll pos=%f\n",pos_y);
 		SetScrolloffsY(pos_y);
+	}
+
+	if (source == hori_bar)
+	{
+		SkScalar pos_x=position;
+
+		printf("scroll before posx=%f\n",pos_x);
+		pos_x=std::min((float)0,(float)pos_x);
+		pos_x=std::max((float)(-(ContentInfo.width - GetWidth())),(float)pos_x);
+		printf("scroll posx=%f\n",pos_x);
+		SetScrolloffsX(pos_x);
 	}
 }
 
@@ -298,6 +341,35 @@ void ScrollView::SetContentSize(SkScalar width, SkScalar height)
 		{
 			delete vert_bar;
 			vert_bar=NULL;
+		}
+	}
+
+
+	if (ContentInfo.width > GetSkRect().width())
+	{
+		if (hori_bar == NULL)
+		{
+			hori_bar = new ScrollBar(Direction::Horizontal);
+			hori_bar->set_controller(this);
+			hori_bar->SetPosition(0,GetSkRect().height()-10);
+			hori_bar->SetSize(GetSkRect().width(),10);
+		}
+
+		ScrollBarInfo barinfo;
+		barinfo.ContentSize=ContentInfo.width;
+		barinfo.DisplaySize=GetSkRect().width();
+		barinfo.offset=0;
+		hori_bar->SetScrollBarInfo(barinfo);
+
+		//childlist.push_back(vert_bar);
+		
+	}
+	else
+	{
+		if (hori_bar != NULL)
+		{
+			delete hori_bar;
+			hori_bar=NULL;
 		}
 	}
 }
