@@ -4,13 +4,13 @@ ScrollView::ScrollView()
 {
 	SetPosition(0, 0);
 	SetSize(0, 0);
-	nDirectionType = Direction::Vertical;
+//	nDirectionType = Direction::Vertical;
 	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
-
 	background = SkColorSetRGB(255, 255, 255);
-	vert_bar=NULL;
-	hori_bar=NULL;
-
+	vert_bar = new ScrollBar(Direction::Vertical);
+	hori_bar = new ScrollBar(Direction::Horizontal);
+	vert_bar->set_controller(this);
+	hori_bar->set_controller(this);
 }
 
 //void ScrollView::Draw(SkCanvas* canvas)
@@ -145,85 +145,76 @@ void ScrollView::Draw(SkCanvas* canvas)
 
 void ScrollView::OnMouseMove(int x, int y)
 {
+	SkPoint point=ScrollViewToChildPoint(x,y);
+	if (vert_bar != NULL && vert_bar->IsVisible())
+		vert_bar->OnMouseMove(point.x(), point.y());
+
+	if (hori_bar != NULL && hori_bar->IsVisible())
+		hori_bar->OnMouseMove(point.x(), point.y());
+
+	/*if (point.x() >= vert_bar->GetSkRect().left() && point.x() <= vert_bar->GetSkRect().right() && point.y() >= vert_bar->GetSkRect().top() && point.y() <= vert_bar->GetSkRect().bottom())
+		return;
+	if (point.x() >= hori_bar->GetSkRect().left() && point.x() <= hori_bar->GetSkRect().right() && point.y() >= hori_bar->GetSkRect().top() && point.y() <= hori_bar->GetSkRect().bottom())
+		return ;
+
+	if(point.x()>GetWidth() || point.y()>GetHeight())
+		return;*/
+
 	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		pChild->OnMouseMove(child_x, child_y);
+		pChild->OnMouseMove(point.x(), point.y());
 	}
 
-	if (vert_bar != NULL)
-	{
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		vert_bar->OnMouseMove(child_x, child_y);
-	}
-
-	if (hori_bar != NULL)
-	{
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		hori_bar->OnMouseMove(child_x, child_y);
-	}
+	
 }
 
 void  ScrollView::OnMouseDown(int x, int y)
 {
+	SkPoint point=ScrollViewToChildPoint(x,y);
+	if (vert_bar != NULL)
+	{
+		if (point.x() >= vert_bar->GetSkRect().left() && point.x() <= vert_bar->GetSkRect().right() && point.y() >= vert_bar->GetSkRect().top() && point.y() <= vert_bar->GetSkRect().bottom())
+		  return  vert_bar->OnMouseDown(point.x(), point.y());
+	}
+
+	if (hori_bar != NULL && hori_bar->IsVisible())
+	{
+		if (point.x() >= hori_bar->GetSkRect().left() && point.x() <= hori_bar->GetSkRect().right() && point.y() >= hori_bar->GetSkRect().top() && point.y() <= hori_bar->GetSkRect().bottom())
+		   return  hori_bar->OnMouseDown(point.x(), point.y());
+	}
 	for (auto iter = childlist.begin(); iter != childlist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
-
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-
-		if (child_x >= pChild->GetSkRect().left() && child_x <= pChild->GetSkRect().right() && child_y >= pChild->GetSkRect().top() && child_y <= pChild->GetSkRect().bottom())
+		if (point.x() >= pChild->GetSkRect().left() && point.x() <= pChild->GetSkRect().right() && point.y() >= pChild->GetSkRect().top() && point.y() <= pChild->GetSkRect().bottom())
 		{
-
-			printf("x=%d,y=%d,child_x=%d,child_y=%d,left=%f,right=%f,top=%f,bottom=%f\n", x, y, child_x, child_y, pChild->GetSkRect().left(), pChild->GetSkRect().right(), pChild->GetSkRect().top(), pChild->GetSkRect().bottom());
-			pChild->OnMouseDown(child_x, child_y);
-			return;
+			//printf("x=%d,y=%d,child_x=%d,child_y=%d,left=%f,right=%f,top=%f,bottom=%f\n", x, y, point.x(), point.y(), pChild->GetSkRect().left(), pChild->GetSkRect().right(), pChild->GetSkRect().top(), pChild->GetSkRect().bottom());
+			return pChild->OnMouseDown(point.x(), point.y());
 		}
 		
 	}
 
-	if (vert_bar != NULL)
-	{
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		vert_bar->OnMouseDown(child_x, child_y);
-	}
-
-	if (hori_bar != NULL)
-	{
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		hori_bar->OnMouseDown(child_x, child_y);
-	}
+	
 }
 
 
 void ScrollView::OnMouseUp(int x, int y)
 {
-	if (vert_bar != NULL)
+	SkPoint point=ScrollViewToChildPoint(x,y);
+	if (vert_bar != NULL && vert_bar->IsVisible())
 	{
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		vert_bar->OnMouseUp(child_x, child_y);
+		vert_bar->OnMouseUp(point.x(), point.y());
 	}
-
-	if (hori_bar != NULL)
+	if (hori_bar != NULL && hori_bar->IsVisible())
 	{
-		int child_x = x - GetSkRect().left();
-		int child_y = y - GetSkRect().top();
-		hori_bar->OnMouseUp(child_x, child_y);
+		hori_bar->OnMouseUp(point.x(), point.y());
 	}
 }
 
 void ScrollView::OnMouseWheel(float delta, uint32_t modifier)
 {
 	//printf("OnMouseWheel delta=%f,modifier=%d\n",delta,modifier);
-	if(vert_bar==NULL)
+	if(vert_bar==NULL || !vert_bar->IsVisible())
 		return;
 	ScrollToPosition(vert_bar,GetScrolloffsY()+delta*10);
 }
@@ -236,53 +227,49 @@ void ScrollView::ScrollToPosition(ScrollBar* source, int position)
 	if (source == vert_bar)
 	{
 		SkScalar pos_y=position;
-
-		printf("scroll before pos=%f\n",pos_y);
+		//printf("scroll before pos=%f\n",pos_y);
 		pos_y=std::min((float)0,(float)pos_y);
 		pos_y=std::max((float)(-(ContentInfo.height - GetHeight())),(float)pos_y);
-		printf("scroll pos=%f\n",pos_y);
+		//printf("scroll pos=%f\n",pos_y);
 		SetScrolloffsY(pos_y);
 	}
 
 	if (source == hori_bar)
 	{
 		SkScalar pos_x=position;
-
-		printf("scroll before posx=%f\n",pos_x);
 		pos_x=std::min((float)0,(float)pos_x);
 		pos_x=std::max((float)(-(ContentInfo.width - GetWidth())),(float)pos_x);
-		printf("scroll posx=%f\n",pos_x);
 		SetScrolloffsX(pos_x);
 	}
 }
 
-void ScrollView::SetDirection(Direction nType)
-{
-	nDirectionType = nType;
-}
-
-void ScrollView::JumpTop()
-{
-	if (nDirectionType == Direction::Vertical)
-		ContentInfo.offs_y = 0;
-	this->RunAction(new ScrollTo(0, 0, ContentInfo.offs_y));
-}
-void ScrollView::JumpBottom()
-{
-	if (nDirectionType == Direction::Vertical)
-		ContentInfo.offs_y= -(ContentInfo.height - GetHeight());
-	this->RunAction(new ScrollTo(0, 0, ContentInfo.offs_y));
-	/*if (nDirectionType == Direction::Vertical)
-		ContentInfo.offs = -(ContentInfo.height - GetHeight());
-	SetScrollOffs(ContentInfo.offs);*/
-}
-
-void ScrollView::JumpLeft()
-{
-}
-void ScrollView::JumpRight()
-{
-}
+//void ScrollView::SetDirection(Direction nType)
+//{
+//	nDirectionType = nType;
+//}
+//
+//void ScrollView::JumpTop()
+//{
+//	if (nDirectionType == Direction::Vertical)
+//		ContentInfo.offs_y = 0;
+//	this->RunAction(new ScrollTo(0, 0, ContentInfo.offs_y));
+//}
+//void ScrollView::JumpBottom()
+//{
+//	if (nDirectionType == Direction::Vertical)
+//		ContentInfo.offs_y= -(ContentInfo.height - GetHeight());
+//	this->RunAction(new ScrollTo(0, 0, ContentInfo.offs_y));
+//	/*if (nDirectionType == Direction::Vertical)
+//		ContentInfo.offs = -(ContentInfo.height - GetHeight());
+//	SetScrollOffs(ContentInfo.offs);*/
+//}
+//
+//void ScrollView::JumpLeft()
+//{
+//}
+//void ScrollView::JumpRight()
+//{
+//}
 
 void ScrollView::InitOffset()
 {
@@ -315,68 +302,50 @@ void ScrollView::SetContentSize(SkScalar width, SkScalar height)
 {
 	ContentInfo.height = height;
 	ContentInfo.width = width;
-
 	if (ContentInfo.height > GetSkRect().height())
 	{
-		if (vert_bar == NULL)
-		{
-			vert_bar = new ScrollBar(Direction::Vertical);
-			vert_bar->set_controller(this);
-			vert_bar->SetPosition(GetSkRect().width()-10,0);
-			vert_bar->SetSize(10,GetSkRect().height());
-		}
-
+		vert_bar->SetPosition(GetSkRect().width()-10,0);
+		vert_bar->SetSize(10,GetSkRect().height());
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.height;
 		barinfo.DisplaySize=GetSkRect().height();
 		barinfo.offset=0;
 		vert_bar->SetScrollBarInfo(barinfo);
-
-		//childlist.push_back(vert_bar);
-		
 	}
-	else
-	{
-		if (vert_bar != NULL)
-		{
-			delete vert_bar;
-			vert_bar=NULL;
-		}
-	}
-
 
 	if (ContentInfo.width > GetSkRect().width())
 	{
-		if (hori_bar == NULL)
-		{
-			hori_bar = new ScrollBar(Direction::Horizontal);
-			hori_bar->set_controller(this);
-			hori_bar->SetPosition(0,GetSkRect().height()-10);
-			hori_bar->SetSize(GetSkRect().width(),10);
-		}
-
+		hori_bar->SetPosition(0,GetSkRect().height()-10);
+		hori_bar->SetSize(GetSkRect().width(),10);
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.width;
 		barinfo.DisplaySize=GetSkRect().width();
 		barinfo.offset=0;
 		hori_bar->SetScrollBarInfo(barinfo);
-
-		//childlist.push_back(vert_bar);
-		
-	}
-	else
-	{
-		if (hori_bar != NULL)
-		{
-			delete hori_bar;
-			hori_bar=NULL;
-		}
 	}
 }
 
 void ScrollView::SetBackGroundColor(SkColor color)
 {
 	background = color;
+}
+
+
+
+void ScrollView::SetHorizontalScrollBar(ScrollBar* horiz_sb) 
+{
+   horiz_sb->SetVisible(vert_bar->IsVisible());
+   delete vert_bar;
+   horiz_sb->set_controller(this);
+   vert_bar = horiz_sb;
+}
+
+void ScrollView::SetVerticalScrollBar(ScrollBar* vert_sb) 
+{
+   vert_sb->SetVisible(hori_bar->IsVisible());
+   delete hori_bar;
+   vert_sb->set_controller(this);
+   hori_bar = vert_sb;
 }
 
 

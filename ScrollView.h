@@ -35,17 +35,24 @@ public:
 	void OnMouseUp(int x,int y) override;
 	void OnMouseWheel(float delta, uint32_t modifier) override;
 
+	SkPoint ScrollViewToChildPoint(int x, int y) 
+	{
+		SkPoint point;
+		point.set(x - GetSkRect().left(), y - GetSkRect().top());
+		return point;
+	}
+
 //	void AddChild(char *pImagePath);
 	void AddChild(UIWidget *pWidget);
 
-	void JumpTop();
+	/*void JumpTop();
 	void JumpBottom();
 	void JumpLeft();
-	void JumpRight();
+	void JumpRight();*/
 
 	void SetContentSize(SkScalar width, SkScalar height);
 
-	void SetDirection(Direction nType);
+	//void SetDirection(Direction nType);
 	
 	void RemoveAllChildWidget();
 
@@ -55,11 +62,20 @@ public:
 
 	void ScrollToPosition(ScrollBar* source, int position);
 
+	// Customize the scrollbar design. ScrollView takes the ownership of the
+    // specified ScrollBar. |horiz_sb| and |vert_sb| cannot be NULL.
+    void SetHorizontalScrollBar(ScrollBar* horiz_sb);
+    void SetVerticalScrollBar(ScrollBar* vert_sb);
+
+   // Returns the horizontal/vertical scrollbar. This may return NULL.
+    ScrollBar* GetHorizontalScrollBar() const { return hori_bar; }
+    ScrollBar* GetVerticalScrollBar() const { return vert_bar; }
+
 private:
 	std::vector<sk_sp<SkImage>> imagelist;
 	/*SkScalar offs;
 	SkScalar hei;*/
-	Direction nDirectionType;
+	//Direction nDirectionType;
 	ScrollContentInfo ContentInfo;
 
 	std::vector<UIWidget *> childlist;

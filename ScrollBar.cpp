@@ -6,6 +6,8 @@ ScrollBar::ScrollBar(Direction dir)
 	nDirectionType=dir;
 	thumbst=ThumbStatu::NormalStatu;
 	SetMouseDragged(false);
+	SetPosition(0, 0);
+	SetSize(0,0);
 }
 
 ScrollBar::~ScrollBar()
@@ -33,6 +35,8 @@ SkScalar ScrollBar::GetThumbPosition()
 
 void ScrollBar::Draw(SkCanvas* canvas)
 {
+	if(GetWidth()==0 || GetHeight()==0 || !IsVisible())
+		return;
 	SkPaint paint;
 	paint.setColor(SkColorSetRGB(241,241,241));
 	canvas->drawRect(GetSkRect(),paint);
@@ -49,14 +53,13 @@ void ScrollBar::Draw(SkCanvas* canvas)
 	else if(nDirectionType==Direction::Horizontal)
 		 thumbrect.set(GetSkRect().left()+ThumbPos, GetSkRect().top(), GetSkRect().left()+ThumbPos+GetThumbSize(),GetSkRect().top()+GetSkRect().height());
 	canvas->drawRect(thumbrect,paint);
-	/*if(nDirectionType==Direction::Vertical)
-	   canvas->drawRect(SkRect{  },paint);
-	else if(nDirectionType==Direction::Horizontal)
-		 canvas->drawRect(SkRect{ GetSkRect().left()+ThumbPos, GetSkRect().top(), GetSkRect().left()+ThumbPos+GetThumbSize(),GetSkRect().height() },paint);*/
+	
 }
 
 void ScrollBar::OnMouseMove(int x, int y)
 {
+	if (IsVisible() == false)
+		return;
 	if (x >= thumbrect.left() && x <= thumbrect.right() && y >= thumbrect.top() && y <= thumbrect.bottom())
 	{
 		thumbst=ThumbStatu::MouseStayStatu;
@@ -91,7 +94,7 @@ void ScrollBar::OnMouseMove(int x, int y)
 		    nMousePos=y;
 		thumbst=ThumbStatu::MousePressedStatu;
 		int thumb_move =  mouse_offset-nMousePos;
-		printf("thumb_y2=%d\n",nMousePos);
+		//printf("thumb_y2=%d\n",nMousePos);
 		if(nDirectionType==Direction::Vertical)
 		   GetScrollBarController()->ScrollToPosition(this,thumb_move*barinfo.ContentSize/GetHeight());
 		else if (nDirectionType == Direction::Horizontal)
@@ -101,13 +104,15 @@ void ScrollBar::OnMouseMove(int x, int y)
 
 void ScrollBar::OnMouseDown(int x, int y)
 {
+	if (IsVisible() == false)
+		return;
 	int nMousePos=x;
 	if(nDirectionType==Direction::Vertical)
 		nMousePos=y;
 	if (GetMouseDragged()==false)
 	{
 		mouse_offset=nMousePos+(-GetThumbPosition());
-		printf("mouse_offset=%d\n",y);
+		//printf("mouse_offset=%d\n",y);
 		SetMouseDragged(true);
 	}
 	
@@ -115,6 +120,8 @@ void ScrollBar::OnMouseDown(int x, int y)
 
 void ScrollBar::OnMouseUp(int x, int y)
 {
-	printf("mouse up=%d\n",y);
+	if (IsVisible() == false)
+		return;
+	//printf("mouse up=%d\n",y);
 	SetMouseDragged(false);
 }
