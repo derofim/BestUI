@@ -10,6 +10,22 @@
 
 //SkPoint
 
+class StaticText :public UIWidget {
+public:
+	StaticText(char *pText);
+	~StaticText();
+	SkString GetText() {
+		return text;
+	}
+	void Draw(SkCanvas* canvas) override;
+	void OnMouseMove(int x, int y) override {};
+	void OnMouseDown(int x, int y) override {};
+	void OnMouseUp(int x, int y) override {};
+	void OnMouseWheel(float delta, uint32_t modifier) override {};
+private:
+	SkString text;
+
+};
 
 
 class Button :public UIWidget {

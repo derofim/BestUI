@@ -54,18 +54,18 @@ void ButtonImage::Draw(SkCanvas* canvas)
 {
 	if (IsVisible() == false)
 		return;
-	if (GetSkRect().right() == 0 || GetSkRect().bottom() == 0)
+	if (GetBound().right() == 0 || GetBound().bottom() == 0)
 	{
 		SetSize(NormalImage->width(), NormalImage->height());
 		SetSize(PressedImage->width(), PressedImage->height());
 		SetSize(DisabledImage->width(), DisabledImage->height());
 	}
 	if(GetButState()== but_NormalStatu)
-	  canvas->drawImageRect(NormalImage.get(), GetSkRect(),0);
+	  canvas->drawImageRect(NormalImage.get(), GetBound(),0);
 	else if(GetButState() == but_MouseStayStatu)
-		canvas->drawImageRect(PressedImage.get(), GetSkRect(), 0);
+		canvas->drawImageRect(PressedImage.get(), GetBound(), 0);
 	else if(GetButState() == but_DisabledStatu)
-		canvas->drawImageRect(DisabledImage.get(), GetSkRect(), 0);
+		canvas->drawImageRect(DisabledImage.get(), GetBound(), 0);
 }
 
 
@@ -108,14 +108,14 @@ void Button::Draw(SkCanvas* canvas)
 	{
 
 		
-		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetSkRect().left(), GetSkRect().top()-bounds.top(), font, paint);
+		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetBound().left(), GetBound().top()-bounds.top(), font, paint);
 
 	}
 	if (nButState == but_MouseStayStatu)
 	{
 		//paint.setColor(SK_ColorDKGRAY);
 		paint.setColor(SK_ColorRED);
-		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetSkRect().left(), GetSkRect().top() - bounds.top(), font, paint);
+		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetBound().left(), GetBound().top() - bounds.top(), font, paint);
 	}
 }
 
@@ -132,7 +132,7 @@ void Button::OnMouseMove(int x, int y)
 {
 	if (nButState == but_DisabledStatu)
 		return;
-	if (x >= GetSkRect().left() && x <= GetSkRect().right() && y >= GetSkRect().top() && y <= GetSkRect().bottom())
+	if (x >= GetBound().left() && x <= GetBound().right() && y >= GetBound().top() && y <= GetBound().bottom())
 		nButState = but_MouseStayStatu;
 	else
 		nButState = but_NormalStatu;
@@ -141,4 +141,26 @@ void Button::OnMouseMove(int x, int y)
 void Button::OnMouseUp(int x, int y)
 {
 
+}
+
+StaticText::StaticText(char *pText)
+{
+	text = pText;
+}
+StaticText::~StaticText()
+{
+
+}
+
+void StaticText::Draw(SkCanvas* canvas)
+{
+	if (IsVisible() == false)
+		return;
+	SkFont font;
+	font.setSubpixel(true);
+	font.setSize(16);
+	SkPaint paint;
+	SkRect bounds;
+	font.measureText(text.c_str(), text.size(), kUTF8_SkTextEncoding, &bounds);
+	canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetBound().left(), GetBound().top()-bounds.top(), font, paint);
 }

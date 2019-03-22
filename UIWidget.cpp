@@ -10,15 +10,15 @@ UIWidget::UIWidget()
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {
-	rect.set(x,y,x+GetWidth(),y+GetHeight());
+	SetBound(x,y,x+GetWidth(),y+GetHeight());
 	
 }
 void UIWidget::SetSize(SkScalar width, SkScalar height)
 {
-	rect.set(rect.left(), rect.top(), width + rect.left(), height + rect.top());
+	SetBound(rect.left(), rect.top(), width + rect.left(), height + rect.top());
 }
 
-void UIWidget::SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom)
+void UIWidget::SetBound(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom)
 {
 	rect.set(left, top, right, bottom);
 }

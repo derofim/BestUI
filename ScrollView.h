@@ -38,7 +38,7 @@ public:
 	SkPoint ScrollViewToChildPoint(int x, int y) 
 	{
 		SkPoint point;
-		point.set(x - GetSkRect().left(), y - GetSkRect().top());
+		point.set(x - GetBound().left(), y - GetBound().top());
 		return point;
 	}
 
@@ -62,6 +62,9 @@ public:
 
 	void ScrollToPosition(ScrollBar* source, int position);
 
+	SkScalar GetDisplayWidth();
+	SkScalar GetDisplayHeigth() ;
+
 	// Customize the scrollbar design. ScrollView takes the ownership of the
     // specified ScrollBar. |horiz_sb| and |vert_sb| cannot be NULL.
     void SetHorizontalScrollBar(ScrollBar* horiz_sb);
@@ -79,9 +82,13 @@ private:
 	ScrollContentInfo ContentInfo;
 
 	std::vector<UIWidget *> childlist;
+
+	std::vector<UIWidget *> displaylist;
 	SkColor background;
 
 	ScrollBar *vert_bar;
 	ScrollBar *hori_bar;
+	bool bFirstDraw;
 
+	long long llLastDraw;
 };

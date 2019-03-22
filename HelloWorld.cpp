@@ -25,6 +25,7 @@ using namespace sk_app;
 
  ActionManage *gActionManage;
  GameTimerManage *gTimerManage;
+ std::vector<UIWidget *> gWidgetList;
 Application* Application::Create(int argc, char** argv, void* platformData) {
 
 	gActionManage = new ActionManage();

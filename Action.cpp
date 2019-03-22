@@ -79,12 +79,12 @@ MoveTo::MoveTo(double runtime, SkScalar x, SkScalar y)
 
 void MoveTo::StartAction()
 {
-	init_x = GetWidget()->GetSkRect().left();
-	init_y = GetWidget()->GetSkRect().top();
-	/*range_x = fabs(move_x - GetWidget()->GetSkRect().left());
-	range_y = fabs(move_y - GetWidget()->GetSkRect().top());*/
-	range_x = move_x - GetWidget()->GetSkRect().left();
-	range_y = move_y - GetWidget()->GetSkRect().top();
+	init_x = GetWidget()->GetBound().left();
+	init_y = GetWidget()->GetBound().top();
+	/*range_x = fabs(move_x - GetWidget()->GetBound().left());
+	range_y = fabs(move_y - GetWidget()->GetBound().top());*/
+	range_x = move_x - GetWidget()->GetBound().left();
+	range_y = move_y - GetWidget()->GetBound().top();
 }
 void MoveTo::StopAction()
 {

@@ -37,7 +37,7 @@ void UIRoot::OnMouseDown(int x, int y)
 	for (auto iter = GetWidgetList()->end()-1; ;iter--)
 	{
 		UIWidget *pWidget = *iter;
-		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom() && pWidget->IsVisible())
+		if (x >= pWidget->GetBound().left() && x <= pWidget->GetBound().right() && y >= pWidget->GetBound().top() && y <= pWidget->GetBound().bottom() && pWidget->IsVisible())
 		{
 			pWidget->OnMouseDown(x, y);
 			return;
@@ -55,7 +55,7 @@ void UIRoot::OnMouseUp(int x, int y)
 	for (auto iter = GetWidgetList()->end()-1; ;iter--)
 	{
 		UIWidget *pWidget = *iter;
-		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom() && pWidget->IsVisible())
+		if (x >= pWidget->GetBound().left() && x <= pWidget->GetBound().right() && y >= pWidget->GetBound().top() && y <= pWidget->GetBound().bottom() && pWidget->IsVisible())
 		{
 			pWidget->OnMouseUp(x, y);
 			return;
@@ -74,7 +74,7 @@ void  UIRoot::OnMouseMove(int x, int y)
 	{
 		UIWidget *pWidget = *iter;
 		pWidget->OnMouseMove(x, y);
-		if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom())
+		if (x >= pWidget->GetBound().left() && x <= pWidget->GetBound().right() && y >= pWidget->GetBound().top() && y <= pWidget->GetBound().bottom())
 			return;
 		if (iter == GetWidgetList()->begin())
 			break;
@@ -89,7 +89,7 @@ void  UIRoot::OnMouseWheel(float delta, uint32_t modifier)
 	{
 		UIWidget *pWidget = *iter;
 		pWidget->OnMouseWheel(delta, modifier);
-		/*if (x >= pWidget->GetSkRect().left() && x <= pWidget->GetSkRect().right() && y >= pWidget->GetSkRect().top() && y <= pWidget->GetSkRect().bottom())
+		/*if (x >= pWidget->GetBound().left() && x <= pWidget->GetBound().right() && y >= pWidget->GetBound().top() && y <= pWidget->GetBound().bottom())
 			return;*/
 		if (iter == GetWidgetList()->begin())
 			break;

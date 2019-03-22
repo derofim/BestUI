@@ -91,8 +91,8 @@ void Sprite::Draw(SkCanvas* canvas)
 	paint.setColorFilter(SkColorFilter::MakeMatrixFilterRowMajor255(matrix.fMat));*/
 
 	canvas->save();
-	canvas->rotate(GetDegress(), GetSkRect().left()+GetWidth()*anchor.fX, GetSkRect().top()+GetHeight()*anchor.fY);
-	canvas->drawImageRect(SpriteImage.get(), GetSkRect(), &paint);
+	canvas->rotate(GetDegress(), GetBound().left()+GetWidth()*anchor.fX, GetBound().top()+GetHeight()*anchor.fY);
+	canvas->drawImageRect(SpriteImage.get(), GetBound(), &paint);
 	canvas->restore();
 }
 

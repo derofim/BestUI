@@ -55,7 +55,7 @@ public:
 	virtual void Draw(SkCanvas* canvas)=0;
 	void SetPosition(SkScalar x, SkScalar y);
 	void SetSize(SkScalar width, SkScalar height);
-	void SetRect(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
+	void SetBound(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
 
 	void RunAction(Action *type);
 	void StopAllAction();
@@ -77,7 +77,7 @@ public:
 		return rect.height();
 	}
 
-	SkRect GetSkRect()
+	SkRect GetBound()
 	{
 		return rect;
 	}

@@ -22,7 +22,7 @@ void ScrollBar::SetScrollBarInfo(ScrollBarInfo info)
 
 SkScalar ScrollBar::GetThumbSize()
 {
-	return barinfo.DisplaySize*barinfo.DisplaySize/barinfo.ContentSize;
+	return std::max((float)10,barinfo.DisplaySize*barinfo.DisplaySize/barinfo.ContentSize);
 }
 
 SkScalar ScrollBar::GetThumbPosition()
@@ -39,7 +39,7 @@ void ScrollBar::Draw(SkCanvas* canvas)
 		return;
 	SkPaint paint;
 	paint.setColor(SkColorSetRGB(241,241,241));
-	canvas->drawRect(GetSkRect(),paint);
+	canvas->drawRect(GetBound(),paint);
 
 	paint.setColor(SkColorSetRGB(193,193,193));
 
@@ -49,9 +49,9 @@ void ScrollBar::Draw(SkCanvas* canvas)
 		paint.setColor(SkColorSetRGB(123,123,123));
 	SkScalar ThumbPos=GetThumbPosition();
 	if(nDirectionType==Direction::Vertical)
-	   thumbrect.set(GetSkRect().left(),GetSkRect().top()+ThumbPos,GetWidth()+GetSkRect().left(),GetThumbSize()+GetSkRect().top()+ThumbPos);
+	   thumbrect.set(GetBound().left(),GetBound().top()+ThumbPos,GetWidth()+GetBound().left(),GetThumbSize()+GetBound().top()+ThumbPos);
 	else if(nDirectionType==Direction::Horizontal)
-		 thumbrect.set(GetSkRect().left()+ThumbPos, GetSkRect().top(), GetSkRect().left()+ThumbPos+GetThumbSize(),GetSkRect().top()+GetSkRect().height());
+		 thumbrect.set(GetBound().left()+ThumbPos, GetBound().top(), GetBound().left()+ThumbPos+GetThumbSize(),GetBound().top()+GetBound().height());
 	canvas->drawRect(thumbrect,paint);
 	
 }
