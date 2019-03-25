@@ -88,7 +88,7 @@ private:
 
 	ScrollBar *vert_bar;
 	ScrollBar *hori_bar;
-	bool bFirstDraw;
 
-	long long llLastDraw;
+	double fDrawTime;
+	long long llDrawTick;
 };

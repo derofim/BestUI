@@ -11,8 +11,7 @@ ScrollView::ScrollView()
 	hori_bar = new ScrollBar(Direction::Horizontal);
 	vert_bar->set_controller(this);
 	hori_bar->set_controller(this);
-	bFirstDraw=true;
-	llLastDraw=GetTickCount64();
+	llDrawTick=0;
 }
 
 //void ScrollView::Draw(SkCanvas* canvas)
@@ -95,8 +94,10 @@ void ScrollView::Draw(SkCanvas* canvas)
 	SkScalar diff_y = ContentInfo.offs_y - ContentInfo.preoffs_y;
 	ContentInfo.offs_x = GetScrolloffsX();
 	SkScalar diff_x = ContentInfo.offs_x - ContentInfo.preoffs_x;
-	long long llInitStamp=GetTickCount64();
-	if (diff_y != 0 || diff_x != 0 || bFirstDraw==true)
+	//long long llInitStamp=GetTickCount64();
+
+	fDrawTime=SkTime::GetMSecs();
+	if (diff_y != 0 || diff_x != 0 || llDrawTick%30==0 )
 	{
 		
 		displaylist.clear();
@@ -110,8 +111,8 @@ void ScrollView::Draw(SkCanvas* canvas)
 				displaylist.push_back(pChild);
 			}
 		}
-		bFirstDraw=false;
 	}
+
 	/*if (diff != 0)
 	{
 		printf("diff=%f\n", diff);
@@ -137,7 +138,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 	{
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.height;
-		barinfo.DisplaySize=/*GetBound().height()*/vert_bar->GetHeight();
+		barinfo.DisplaySize=vert_bar->GetHeight();
 		barinfo.offset=ContentInfo.offs_y;
 		vert_bar->SetScrollBarInfo(barinfo);
 		vert_bar->Draw(surfaceCanvas);
@@ -147,7 +148,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 	{
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.width;
-		barinfo.DisplaySize=/*GetBound().width()*/hori_bar->GetWidth();
+		barinfo.DisplaySize=hori_bar->GetWidth();
 		barinfo.offset=ContentInfo.offs_x;
 		hori_bar->SetScrollBarInfo(barinfo);
 		hori_bar->Draw(surfaceCanvas);
@@ -156,7 +157,8 @@ void ScrollView::Draw(SkCanvas* canvas)
 	sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
 	canvas->drawImage(image, GetBound().left(), GetBound().top());
 	if (diff_y != 0 || diff_x != 0)
-	   printf("draw need time=%lld\n",GetTickCount64()-llInitStamp);
+	   printf("draw need time=%f\n",SkTime::GetMSecs()-fDrawTime);
+	llDrawTick++;
 
 	//llLastDraw=GetTickCount64();
 }
@@ -248,8 +250,9 @@ void ScrollView::ScrollToPosition(ScrollBar* source, int position)
 		//printf("scroll before pos=%f\n",pos_y);
 		pos_y=std::min((float)0,(float)pos_y);
 		pos_y=std::max((float)(-(ContentInfo.height - GetDisplayHeigth())),(float)pos_y);
-		printf("scroll pos=%f\n",pos_y);
+	//	printf("scroll pos=%f\n",pos_y);
 		SetScrolloffsY(pos_y);
+
 	}
 
 	if (source == hori_bar)
@@ -295,6 +298,8 @@ void ScrollView::InitOffset()
 	ContentInfo.preoffs_y = 0;
 	ContentInfo.offs_x = 0;
 	ContentInfo.preoffs_x = 0;
+	SetScrolloffsX(0);
+	SetScrolloffsY(0);
 }
 
 void ScrollView::RemoveAllChildWidget()
