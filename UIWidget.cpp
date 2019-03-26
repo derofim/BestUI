@@ -39,7 +39,7 @@ void UIWidget::StopAllAction()
 //	Sequence(this, callback);
 //}
 
-void UIWidget::SetUiEventCallBack(CallBackFun fu)
+void UIWidget::SetMouseEventCallBack(MouseEventCallBack fu)
 {
 	callbackf = fu;
 }

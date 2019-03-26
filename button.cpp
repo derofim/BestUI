@@ -62,7 +62,7 @@ void ButtonImage::Draw(SkCanvas* canvas)
 	}
 	if(GetButState()== but_NormalStatu)
 	  canvas->drawImageRect(NormalImage.get(), GetBound(),0);
-	else if(GetButState() == but_MouseStayStatu)
+	else if(GetButState() == but_MouseStayStatu  || GetButState()==but_PressedStatu)
 		canvas->drawImageRect(PressedImage.get(), GetBound(), 0);
 	else if(GetButState() == but_DisabledStatu)
 		canvas->drawImageRect(DisabledImage.get(), GetBound(), 0);
@@ -111,7 +111,7 @@ void Button::Draw(SkCanvas* canvas)
 		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetBound().left(), GetBound().top()-bounds.top(), font, paint);
 
 	}
-	if (nButState == but_MouseStayStatu)
+	if (nButState == but_MouseStayStatu || nButState==but_PressedStatu)
 	{
 		//paint.setColor(SK_ColorDKGRAY);
 		paint.setColor(SK_ColorRED);
@@ -123,8 +123,9 @@ void Button::OnMouseDown(int x, int y)
 {
 	if (nButState == but_DisabledStatu)
 		return;
-	if (GetMouseDownCallBack() != NULL)
-		GetMouseDownCallBack()(this);
+	nButState=but_PressedStatu;
+	/*if (GetMouseDownCallBack() != NULL)
+		GetMouseDownCallBack()(this);*/
 }
 
 
@@ -140,7 +141,12 @@ void Button::OnMouseMove(int x, int y)
 
 void Button::OnMouseUp(int x, int y)
 {
-
+	if (nButState == but_PressedStatu)
+	{
+		if (GetMouseEventCallBack() != NULL)
+		   GetMouseEventCallBack()(this,MOUSE_LBUTTONPRESS);
+		nButState = but_MouseStayStatu;
+	}
 }
 
 StaticText::StaticText(char *pText)

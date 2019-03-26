@@ -105,14 +105,14 @@ void ListView::Draw(SkCanvas* canvas)
 	{
 		RowItem *currow=(*iter);
 	    nOffsetY+=currow->nRowHeigth;
-		if (nOffsetY >= (-ContentInfo.offs_y) && nOffsetY <= (-ContentInfo.offs_y) + GetDisplayHeigth())
+		if (nOffsetY >= (-ContentInfo.offs_y) && nOffsetY <= (-ContentInfo.offs_y) + GetDisplayHeigth()+currow->nRowHeigth)
 		{
 			nOffsetX=0;
 			int nCol=0;
 			for (auto iter =currow->celllist.begin(); iter != currow->celllist.end(); iter++,nCol++)
 			{
 				nOffsetX+=collist.at(nCol).nWidth;
-				if (nOffsetX >= (-ContentInfo.offs_x) && nOffsetX <= (-ContentInfo.offs_x) + GetDisplayWidth())
+				if (nOffsetX >= (-ContentInfo.offs_x) && nOffsetX <= (-ContentInfo.offs_x) + GetDisplayWidth()+collist.at(nCol).nWidth)
 				{
 					UIWidget *pChild = (*iter).pWidget;
 					SkScalar top=(nOffsetY-(-ContentInfo.offs_y))-currow->nRowHeigth;

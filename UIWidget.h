@@ -15,7 +15,18 @@ class Action;
 extern  ActionManage *gActionManage;
 
 class UIWidget;
-typedef std::function<void(UIWidget *p)> CallBackFun;
+
+
+enum MouseEvent{
+	MOUSE_LBUTTONPRESS,
+	MOUSE_DOUBLECLICK,
+	MOUSE_MOVE,
+	MOUSE_LEAVE,
+	MOUSE_WHEEL
+};
+
+
+typedef std::function<void(UIWidget *p,MouseEvent ev)> MouseEventCallBack;
 
 
 
@@ -67,7 +78,7 @@ public:
 	virtual void OnMouseUp(int x,int y)=0;
 	virtual void OnMouseWheel(float delta, uint32_t modifier)=0;
 
-	void SetUiEventCallBack(CallBackFun fu);
+	void SetMouseEventCallBack(MouseEventCallBack fu);
 	SkScalar GetWidth()
 	{
 		return rect.width();
@@ -82,7 +93,7 @@ public:
 		return rect;
 	}
 
-	CallBackFun GetMouseDownCallBack()
+	MouseEventCallBack GetMouseEventCallBack()
 	{
 		return callbackf;
 	}
@@ -136,7 +147,7 @@ public:
 private:
 	//SkPoint point;
 	SkRect rect;
-	CallBackFun callbackf;
+	MouseEventCallBack callbackf;
 	int nTag;
 	bool bShowWindow;
 	SkScalar fDegress;

@@ -107,8 +107,7 @@ void Sprite::SetScale(SkScalar sx, SkScalar sy)
 	SpriteImage->scalePixels(scaled, kHigh_SkFilterQuality, SkImage::kDisallow_CachingHint);
 	SpriteImage.get()->unref();
 	SpriteImage.release();
-	//delete SpriteImage.get();
-	////不知道会不会内存泄漏
+	
 	SpriteImage = SkImage::MakeRasterCopy(scaled);
 	SetSize(SpriteImage->width(), SpriteImage->height());
 }

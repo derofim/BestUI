@@ -36,6 +36,7 @@ public:
 	void SetText(const char *pText);
 	enum {
 		but_NormalStatu,
+		but_PressedStatu,
 		but_MouseStayStatu,
 		but_DisabledStatu,
 	};

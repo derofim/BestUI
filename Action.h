@@ -6,15 +6,6 @@
 #include <map>
 
 
-//
-//
-//
-////Í¬Ê±Ö´ÐÐ
-//class Spawn :public ActionManage
-//{
-//public:
-//};
-//
 
 
 

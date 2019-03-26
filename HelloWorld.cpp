@@ -20,6 +20,9 @@
 #include "ScrollView.h"
 #include "Sprite.h"
 #include "Action.h"
+#include "RollImage.h"
+#include "ListView.h"
+
 using namespace sk_app;
 
 
@@ -37,7 +40,7 @@ Application* Application::Create(int argc, char** argv, void* platformData) {
 
 }
 
-void HelloWorld::ClickCallback(UIWidget *pWidget)
+void HelloWorld::ClickCallback(UIWidget *pWidget,MouseEvent ev)
 {
 	Button *but =(Button *) pWidget;
 	const char *pBuf = but->GetText().c_str();
@@ -59,6 +62,79 @@ void HelloWorld::TestTimer2()
 	//this->KillTimer(timer_sel(HelloWorld::TestTimer));
 }
 
+
+
+void HelloWorld::TestScrollView()
+{
+	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
+	ScrollView *sview = new ScrollView();
+	char pszPath[256];
+	
+	int nLine=100000;
+	for (int j = 0; j <nLine; j++)
+	{
+		for (int k = 0; k < 3; k++)
+		{
+			StaticText *text;
+			if (k == 0)
+			{
+				sprintf_s(pszPath,256,"%d",j+1);
+				text = new StaticText(pszPath);
+			}
+			else
+			   text = new StaticText(pszTest[k]);
+			//but->SetText(pszTest[k]);
+			text->SetSize(100, 25);
+			text->SetPosition(100*k,j*25);
+			sview->AddChild(text);
+		}
+		//but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
+		
+	}
+
+	//sview->SetDirection(ScrollView::Direction::Horizontal);
+	sview->SetPosition(100, 200);
+	sview->SetSize(580,580);
+	sview->SetContentSize(1024,nLine*25);
+	//sview->JumpBottom();
+	this->AddWidget(sview);
+}
+void HelloWorld::TestListView()
+{
+	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
+	ListView *view = new ListView();
+	for(int k=0;k<11;k++)
+		view->AddCol("1",100);
+	char pszPath[256];
+	
+	int nLine=1000;
+	for (int j = 0; j <nLine; j++)
+	{
+		for (int k = 0; k < 11; k++)
+		{
+			StaticText *text;
+			if (k == 0)
+			{
+				sprintf_s(pszPath,256,"%d",j+1);
+				text = new StaticText(pszPath);
+			}
+			else
+			   text = new StaticText(pszTest[k]);
+			
+			view->AddCellItem(text,j,k);
+		}
+		//but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
+		
+	}
+
+	//sview->SetDirection(ScrollView::Direction::Horizontal);
+	view->SetPosition(100, 200);
+	view->SetSize(500,500);
+	view->SetContentSize(1100,nLine*25);
+	//sview->JumpBottom();
+	this->AddWidget(view);
+}
+
 HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	: fBackendType(Window::kNativeGL_BackendType), fRotationAngle(0) {
 	SkGraphics::Init();
@@ -77,51 +153,25 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 
 	fWindow->attach(fBackendType);
 
+	/*InitUi();
+	return;*/
 	
 	//this->SetTimer(std::bind(&HelloWorld::TestTimer, this), 10);
 	//TimerCallBackFun p2 = static_cast<TimerCallBackFun>(&HelloWorld::TestTimer);
-	this->SetTimer(timer_sel(HelloWorld::TestTimer), 2);
-	this->SetTimer(timer_sel(HelloWorld::TestTimer2), 5);
+	/*this->SetTimer(timer_sel(HelloWorld::TestTimer), 2);
+	this->SetTimer(timer_sel(HelloWorld::TestTimer2), 5);*/
 	
+	TestListView();
+	return;
 
-	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
-
-
-	/*Button *but = new Button();
-	but->SetText(pszTest[0]);
-	but->SetSize(80, 17);
-	but->SetPosition(100, 100);
-	this->AddWidget(but);
-	but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));*/
-	
-	//ScrollView *sview = new ScrollView();
-	//char pszPath[256];
-	//
-
-	//for (int k = 0; k <10; k++)
-	//{
-	//	Button *but = new Button();
-	//	but->SetText(pszTest[k]);
-	//	but->SetSize(100, 25);
-	//	sview->AddChild(but);
-	//	but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
-	//	
-	//}
-
-	//sview->SetDirection(ScrollView::Direction::Horizontal);
-	//sview->SetPosition(100, 200);
-	//sview->SetSize(380,30);
-	////sview->JumpBottom();
-	//this->AddWidget(sview);
-
-	char pszPath[256];
+	/*char pszPath[256];
 	sprintf_s(pszPath, 256, "G:\\0.png");
 	Sprite *p = new Sprite(pszPath);
 	this->AddWidget(p);
-	p->SetPosition(300, 300);
+	p->SetPosition(300, 300);*/
 
 	//p->SetAnchorPoint(SkPoint::Make(0.8, 0.8));
-	RotateTo *ro = new RotateTo(2, 360);
+	//RotateTo *ro = new RotateTo(2, 360);
 	//p->RunAction(ro);
 
 
@@ -143,16 +193,16 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 
 	//new Sequence(p, de, pBlink, 0);
 
-	Blink *pBlink = new Blink(2, 2);
-	DelayTime *de = new DelayTime(2);
+	//Blink *pBlink = new Blink(2, 2);
+	//DelayTime *de = new DelayTime(2);
 
 	//Sequence se =  Sequence(p, [&](void) {
 	//	printf("kkkkk222222\n");
 	//	this->KillTimer(timer_sel(HelloWorld::TestTimer));
 	//},pBlink,de,0);
 
-	Sequence se=Sequence(p,0,ro, de, pBlink,0);
-    Repeat re = Repeat(p, &se, 3, 0);
+	//Sequence se=Sequence(p,0,ro, de, pBlink,0);
+   // Repeat re = Repeat(p, &se, 3, 0);
 //	se.RunSequence();
 
 	

@@ -28,9 +28,11 @@ public:
 
 	bool onMouseWheel(float delta, uint32_t modifiers) override;
 
-	void ClickCallback(UIWidget *pWidget);
+	void ClickCallback(UIWidget *pWidget,MouseEvent ev);
 	void TestTimer();
 	void TestTimer2();
+	void TestScrollView();
+	void TestListView();
 private:
     void updateTitle();
 
