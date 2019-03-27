@@ -168,5 +168,10 @@ void StaticText::Draw(SkCanvas* canvas)
 	SkPaint paint;
 	SkRect bounds;
 	font.measureText(text.c_str(), text.size(), kUTF8_SkTextEncoding, &bounds);
-	canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetBound().left(), GetBound().top()-bounds.top(), font, paint);
+
+	int nDrawTextLength=text.size();
+	if (bounds.width() > GetWidth())
+	   nDrawTextLength=(GetWidth())/(bounds.width()/text.size())-1;
+	nDrawTextLength=std::max(0,nDrawTextLength);
+	canvas->drawSimpleText(text.c_str(), nDrawTextLength, kUTF8_SkTextEncoding, GetBound().left(), GetBound().top()-bounds.top(), font, paint);
 }

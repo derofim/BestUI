@@ -110,31 +110,53 @@ void ListView::Draw(SkCanvas* canvas)
 	SkPaint paint;
 	paint.setColor(background);
 	surfaceCanvas->drawRect(SkRect{ 0,0,GetDisplayWidth(),GetDisplayHeigth() }, paint);
-	int nOffsetY=0;
-	int nOffsetX=0;
+	int ins_y=0;
+	int ins_x=0;
 	fDrawTime=SkTime::GetMSecs();
 	displaylist.clear();
 
 	for (auto iter = rowlist.begin(); iter != rowlist.end(); iter++)
 	{
 		RowItem *currow=(*iter);
-	    nOffsetY+=currow->nRowHeigth;
-		if (nOffsetY >= (-ContentInfo.offs_y) && nOffsetY <= (-ContentInfo.offs_y) + GetDisplayHeigth()+currow->nRowHeigth)
+	    ins_y+=currow->nRowHeigth;
+		if (ins_y >= (-ContentInfo.offs_y) && ins_y <= (-ContentInfo.offs_y) + GetDisplayHeigth()+currow->nRowHeigth)
 		{
-			nOffsetX=0;
+			ins_x=0;
 			int nCol=0;
 			for (auto iter =currow->celllist.begin(); iter != currow->celllist.end(); iter++,nCol++)
 			{
-				nOffsetX+=collist.at(nCol).nWidth;
-				if (nOffsetX >= (-ContentInfo.offs_x) && nOffsetX <= (-ContentInfo.offs_x) + GetDisplayWidth()+collist.at(nCol).nWidth)
+				ins_x+=collist.at(nCol).nWidth;
+				if (ins_x >= (-ContentInfo.offs_x) && ins_x <= (-ContentInfo.offs_x) + GetDisplayWidth()+collist.at(nCol).nWidth)
 				{
 					UIWidget *pChild = (*iter).pWidget;
-					SkScalar top=(nOffsetY-(-ContentInfo.offs_y))-currow->nRowHeigth;
+					SkScalar top=(ins_y-(-ContentInfo.offs_y))-currow->nRowHeigth;
 					SkScalar bottom=top+currow->nRowHeigth;
-					SkScalar left=(nOffsetX-(-ContentInfo.offs_x))-collist.at(nCol).nWidth;
+					SkScalar left=(ins_x-(-ContentInfo.offs_x))-collist.at(nCol).nWidth;
 					SkScalar rigth=left+collist.at(nCol).nWidth;
-					pChild->SetBound(left,top,rigth,bottom);
+					
+					if (nViewStyle & LIST_STYLE_VERTGLINE)
+					{
+						SkPoint p1, p2;
+						p1.set(ins_x + ContentInfo.offs_x, top);
+						p2.set(ins_x + ContentInfo.offs_x, bottom);
+						paint.setColor(SkColorSetRGB(30, 30, 30));
+						surfaceCanvas->drawLine(p1, p2, paint);
+						rigth-=1;
+					}
+					if (nViewStyle & LIST_STYLE_HORZGLINE)
+					{
+						SkPoint p1, p2;
+						p1.set( ContentInfo.offs_x, bottom);
+						p2.set(ins_x + ContentInfo.offs_x, bottom);
+						paint.setColor(SkColorSetRGB(30, 30, 30));
+						surfaceCanvas->drawLine(p1, p2, paint);
+						bottom-=1;
+					}
+
+					pChild->SetBound(left+5,top+5,rigth,bottom);
 					displaylist.push_back(pChild);
+
+					pChild->Draw(surfaceCanvas);
 				}
 			}
 		}
@@ -150,11 +172,11 @@ void ListView::Draw(SkCanvas* canvas)
 	//}
 
 	
-	for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
-	{
-		UIWidget *pChild = *iter;
-		pChild->Draw(surfaceCanvas);
-	}
+	//for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
+	//{
+	//	UIWidget *pChild = *iter;
+	//	pChild->Draw(surfaceCanvas);
+	//}
 
 
 	header->Draw(canvas);
