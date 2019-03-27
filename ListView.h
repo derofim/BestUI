@@ -3,13 +3,13 @@
 #include "GrContext.h"
 #include "SkCanvas.h"
 #include "ScrollView.h"
-
+#include "button.h"
+//#include "ListHead.h"
 
 enum CellTypes {
   TEXT_ONLY = 0,
   ICON_AND_TEXT,
 };
-
 
 
 struct CellItem {
@@ -25,6 +25,9 @@ struct ColumnInfo {
 	SkString colname;
 };
 
+#define LIST_STYLE_HEAD        1
+#define LIST_STYLE_VERTGLINE   2   
+#define LIST_STYLE_HORZGLINE   4  
 
 class RowItem {
 public:
@@ -33,9 +36,17 @@ public:
 	int nRowHeigth;
 };
 
+class ListHead;
 class ListView :public UIWidget ,public ScrollBarController 
 {
 public:
+
+	enum ListAligment
+	{
+		LEFT,
+		CENTER,
+		RIGHT
+	};
 	ListView();
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
@@ -61,25 +72,47 @@ public:
 
 	void ScrollToPosition(ScrollBar* source, int position);
 
-	void SetContentSize(SkScalar width, SkScalar height);
+	//void SetContentSize(SkScalar width, SkScalar height);
+	void UpdateScrollBarInfo();
+
+	void SetViewStyle(int nStyle);
+
+	int GetViewStyle()
+	{
+		return nViewStyle;
+	}
+	ListAligment GetListAligment()
+	{
+		return nAligment;
+	}
 
 	SkScalar GetDisplayWidth();
 	SkScalar GetDisplayHeigth();
 
-	SkPoint ScrollViewToChildPoint(int x, int y) 
+	void Sort(int nCol);
+
+	SkPoint ScrollViewToChildPoint(int x, int y);
+
+	std::vector<ColumnInfo> GetColList()
 	{
-		SkPoint point;
-		point.set(x - GetBound().left(), y - GetBound().top());
-		return point;
+		return collist;
 	}
 	//void AddColumn(ColumnInfo col);
 private:
 	ScrollContentInfo ContentInfo;
 	ScrollBar *vert_bar;
 	ScrollBar *hori_bar;
+
+	ListHead *header;
 	SkColor background;
 	std::vector<UIWidget *> displaylist;
 
 	std::vector<RowItem *> rowlist;
 	std::vector<ColumnInfo> collist;
+
+	double fDrawTime;
+
+	std::vector<Button *> titbutlist;
+	int nViewStyle;
+	ListAligment nAligment;
 };

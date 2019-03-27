@@ -7,6 +7,8 @@ enum Direction {
 	Horizontal
 };
 
+#define BAR_VER_WIDTH    10
+#define BAR_HORI_HEIGHT  10
 
 class ScrollBar;
 

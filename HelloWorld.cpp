@@ -102,9 +102,11 @@ void HelloWorld::TestScrollView()
 void HelloWorld::TestListView()
 {
 	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
+
+	char pszTitel[32][32] = { "num","probetcd_helloworld","memory","pid","cpu","username","statues","spec","odbc","myserver"};
 	ListView *view = new ListView();
 	for(int k=0;k<11;k++)
-		view->AddCol("1",100);
+		view->AddCol(pszTitel[k],100);
 	char pszPath[256];
 	
 	int nLine=1000;
@@ -128,9 +130,9 @@ void HelloWorld::TestListView()
 	}
 
 	//sview->SetDirection(ScrollView::Direction::Horizontal);
-	view->SetPosition(100, 200);
+	view->SetPosition(100, 100);
 	view->SetSize(500,500);
-	view->SetContentSize(1100,nLine*25);
+	view->SetViewStyle(LIST_STYLE_HEAD);
 	//sview->JumpBottom();
 	this->AddWidget(view);
 }
@@ -162,6 +164,7 @@ HelloWorld::HelloWorld(int argc, char** argv, void* platformData)
 	this->SetTimer(timer_sel(HelloWorld::TestTimer2), 5);*/
 	
 	TestListView();
+	//TestScrollView();
 	return;
 
 	/*char pszPath[256];
