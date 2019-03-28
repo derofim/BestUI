@@ -202,6 +202,7 @@ void ListView::OnMouseMove(int x, int y)
 	if (hori_bar != NULL && hori_bar->IsVisible())
 		hori_bar->OnMouseMove(x, y);
 
+	header->OnMouseMove(x,y);
 	SkPoint point=ScrollViewToChildPoint(x,y);
 	for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
 	{
@@ -223,6 +224,7 @@ void ListView::OnMouseDown(int x, int y)
 		if (x >= hori_bar->GetBound().left() && x <= hori_bar->GetBound().right() && y >= hori_bar->GetBound().top() && y <= hori_bar->GetBound().bottom())
 		   return  hori_bar->OnMouseDown(x, y);
 	}
+	header->OnMouseDown(x,y);
 
 	SkPoint point=ScrollViewToChildPoint(x,y);
 	for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
@@ -246,6 +248,7 @@ void ListView::OnMouseUp(int x, int y)
 	{
 		hori_bar->OnMouseUp(x, y);
 	}
+	header->OnMouseUp(x,y);
 }
 void ListView::OnMouseWheel(float delta, uint32_t modifier)
 {
@@ -293,20 +296,46 @@ void ListView::ScrollToPosition(ScrollBar* source, int position)
 	}
 }
 
-void ListView::Sort(int nCol)
+void ListView::SetSortCol(SortDescriptor desc)
+{
+	sortdescMap.insert(std::pair<int, SortDescriptor>(desc.nCol, desc));
+}
+
+void ListView::SetSortCol(int nCol)
+{
+	SortDescriptor desc;
+	desc.nCol=nCol;
+	SetSortCol(desc);
+}
+
+void ListView::ReadySort(int nCol)
+{
+	if(sortdescMap.find(nCol)==sortdescMap.end() || nCol<0)
+		return;
+	sortdescMap[nCol].ascending=!sortdescMap[nCol].ascending;
+	QuiteSort(sortdescMap[nCol]);
+	
+}
+
+
+void ListView::QuiteSort(SortDescriptor desc)
 {
 
-	sort(rowlist.begin(), rowlist.end(), [nCol](RowItem *pRowx, RowItem *pRowy)
+	sort(rowlist.begin(), rowlist.end(), [desc](RowItem *pRowx, RowItem *pRowy)
 	{
-		StaticText *x=(StaticText *)pRowx->celllist[nCol].pWidget;
-		StaticText *y=(StaticText *)pRowy->celllist[nCol].pWidget;
-		return atoi(x->GetText().c_str())>atoi(y->GetText().c_str());
+		StaticText *x=(StaticText *)pRowx->celllist[desc.nCol].pWidget;
+		StaticText *y=(StaticText *)pRowy->celllist[desc.nCol].pWidget;
+		if(desc.ascending)
+		     return atoi(x->GetText().c_str())>atoi(y->GetText().c_str());
+		else
+			 return atoi(x->GetText().c_str())<atoi(y->GetText().c_str());
 	});
 	//sort(rowlist.begin(), rowlist.end(), [](UIWidget *x, UIWidget *y) 
 	//{
 	//	return x->nShowOrder < y->nShowOrder;
 	//});
 }
+
 
 
 void ListView::SetViewStyle(int nStyle)
@@ -347,6 +376,10 @@ void ListView::UpdateScrollBarInfo()
 		barinfo.offset=ContentInfo.offs_y;
 		vert_bar->SetScrollBarInfo(barinfo);
 	}
+	else
+	{
+		vert_bar->SetBound(0,0,0,0);
+	}
 
 	if (ContentInfo.width > GetDisplayWidth())
 	{
@@ -365,6 +398,10 @@ void ListView::UpdateScrollBarInfo()
 		barinfo.DisplaySize=hori_bar->GetWidth();
 		barinfo.offset=ContentInfo.offs_x;
 		hori_bar->SetScrollBarInfo(barinfo);
+	}
+	else
+	{
+		hori_bar->SetBound(0,0,0,0);
 	}
 }
 

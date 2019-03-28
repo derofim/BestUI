@@ -36,6 +36,12 @@ public:
 	int nRowHeigth;
 };
 
+struct SortDescriptor
+{
+	int nCol=-1;
+	bool ascending=false;
+};
+
 class ListHead;
 class ListView :public UIWidget ,public ScrollBarController 
 {
@@ -89,7 +95,10 @@ public:
 	SkScalar GetDisplayWidth();
 	SkScalar GetDisplayHeigth();
 
-	void Sort(int nCol);
+	void QuiteSort(SortDescriptor desc);
+	void SetSortCol(SortDescriptor desc);
+	void SetSortCol(int nCol);
+	void ReadySort(int nCol);
 
 	SkPoint ScrollViewToChildPoint(int x, int y);
 
@@ -113,6 +122,7 @@ private:
 	double fDrawTime;
 
 	std::vector<Button *> titbutlist;
+	std::map<int,SortDescriptor> sortdescMap;
 	int nViewStyle;
 	ListAligment nAligment;
 };
