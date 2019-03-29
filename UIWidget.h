@@ -9,7 +9,7 @@
 #include "SkImage.h"
 #include "Action.h"
 #include "GameTimer.h"
-
+#include "sk_app/Window.h"
 class Action;
 
 extern  ActionManage *gActionManage;
@@ -19,14 +19,15 @@ class UIWidget;
 
 enum MouseEvent{
 	MOUSE_LBUTTONPRESS,
+	MOUSE_RBUTTONPRESS,
 	MOUSE_DOUBLECLICK,
 	MOUSE_MOVE,
 	MOUSE_LEAVE,
-	MOUSE_WHEEL
+	MOUSE_WHEEL,
+	MOUSE_NONE
 };
 
-
-typedef std::function<void(UIWidget *p,MouseEvent ev)> MouseEventCallBack;
+typedef std::function<void(UIWidget *p,MouseEvent ev)> MouseCallBackFun;
 
 
 
@@ -78,7 +79,9 @@ public:
 	virtual void OnMouseUp(int x,int y)=0;
 	virtual void OnMouseWheel(float delta, uint32_t modifier)=0;
 
-	void SetMouseEventCallBack(MouseEventCallBack fu);
+	virtual void OnKey(sk_app::Window::Key key, uint32_t modifiers) {};
+
+	void SetMouseEventCallBack(MouseCallBackFun fu);
 	SkScalar GetWidth()
 	{
 		return rect.width();
@@ -88,14 +91,14 @@ public:
 		return rect.height();
 	}
 
-	SkRect GetBound()
+	inline SkRect GetBound()
 	{
 		return rect;
 	}
 
-	MouseEventCallBack GetMouseEventCallBack()
+	MouseCallBackFun GetMouseDownCallBack()
 	{
-		return callbackf;
+		return callback_mouse;
 	}
 
 	void SetTag(int nSet)
@@ -144,14 +147,24 @@ public:
 		fScrolloffsX = offs;
 	}
 
+
+	void SetBackGroundColor(SkColor color)
+	{
+		background=color;
+	}
+	SkColor GetBackGroundColor()
+	{
+		return background;
+	}
 private:
 	//SkPoint point;
 	SkRect rect;
-	MouseEventCallBack callbackf;
+	MouseCallBackFun callback_mouse;
 	int nTag;
 	bool bShowWindow;
 	SkScalar fDegress;
 
 	SkScalar fScrolloffsY;
 	SkScalar fScrolloffsX;
+	SkColor background;
 };

@@ -101,38 +101,40 @@ void HelloWorld::TestScrollView()
 }
 void HelloWorld::TestListView()
 {
-	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll"};
+	char pszTest[32][32] = { "very goods","hello world","miss","SogouWBIpunt","skscalar","button","client","press","oleacc","winine.dll" };
 
-	char pszTitel[32][32] = { "num","probetcd_helloworld","memory","pid","cpu","username","statues","spec","odbc","myserver"};
+	char pszTitel[32][32] = { "num","probetcd_helloworld","memory","pid","cpu","username","statues","spec","odbc","myserver" };
 	ListView *view = new ListView();
-	for(int k=0;k<11;k++)
-		view->AddCol(pszTitel[k],100);
+	for (int k = 0; k < 11; k++)
+		view->AddCol(pszTitel[k], 100);
 	char pszPath[256];
-	
-	int nLine=1000;
-	for (int j = 0; j <nLine; j++)
+
+	int nLine = 30;
+	for (int j = 0; j < nLine; j++)
 	{
 		for (int k = 0; k < 11; k++)
 		{
 			StaticText *text;
 			if (k == 0)
 			{
-				sprintf_s(pszPath,256,"%d",j+1);
+				sprintf_s(pszPath, 256, "%d", j + 1);
 				text = new StaticText(pszPath);
 			}
 			else
-			   text = new StaticText(pszTest[k]);
-			
-			view->AddCellItem(text,j,k);
+				text = new StaticText(pszTest[k]);
+
+			view->AddCellItem(text, j, k);
 		}
 		//but->SetUiEventCallBack(std::bind(&HelloWorld::ClickCallback, this, std::placeholders::_1));
-		
+
 	}
 
 	//sview->SetDirection(ScrollView::Direction::Horizontal);
 	view->SetPosition(100, 100);
-	view->SetSize(500,500);
-	view->SetViewStyle(LIST_STYLE_HEAD);
+	view->SetSize(500, 500);
+	view->SetViewStyle(7);
+	view->SetSelectedCellItemBackGround(SkColorSetRGB(85,150,150));
+	view->SetSortCol(0);
 	//sview->JumpBottom();
 	this->AddWidget(view);
 }
@@ -287,5 +289,11 @@ bool HelloWorld::onMouse(int x, int y, Window::InputState state, uint32_t modifi
 bool HelloWorld::onMouseWheel(float delta, uint32_t modifiers)
 {
 	OnMouseWheel(delta,modifiers);
+	return true;
+}
+
+bool HelloWorld::onKey(sk_app::Window::Key key, sk_app::Window::InputState state, uint32_t modifiers)
+{
+	OnKey(key,modifiers);
 	return true;
 }

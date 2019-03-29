@@ -4,10 +4,11 @@
 
 #include "Action.h"
 #include "GameTimer.h"
+#include "sk_app/Window.h"
 class Action;
 
 
-
+//class sk_app;
 class UIRoot:public UIShard{
 public:
 	//void AddWidget(UIWidget *pWidget,int nShowOrder=0);
@@ -19,7 +20,7 @@ public:
 	void OnMouseUp(int x,int y);
 
 	void OnMouseWheel(float delta, uint32_t modifiers);
-
+	void OnKey(sk_app::Window::Key key, uint32_t modifiers);
 private:
 	//std::vector<UIWidget *> widgetlist;
 };

@@ -104,10 +104,8 @@ void Button::Draw(SkCanvas* canvas)
 	
 	SkRect bounds;
 	font.measureText(text.c_str(), text.size(), kUTF8_SkTextEncoding, &bounds);
-	if (nButState == but_NormalStatu)
+	if (nButState == but_NormalStatu )
 	{
-
-		
 		canvas->drawSimpleText(text.c_str(), text.size(), kUTF8_SkTextEncoding, GetBound().left(), GetBound().top()-bounds.top(), font, paint);
 
 	}
@@ -134,19 +132,28 @@ void Button::OnMouseMove(int x, int y)
 	if (nButState == but_DisabledStatu)
 		return;
 	if (x >= GetBound().left() && x <= GetBound().right() && y >= GetBound().top() && y <= GetBound().bottom())
-		nButState = but_MouseStayStatu;
+	{
+		if(nButState!=but_PressedStatu)
+		  nButState = but_MouseStayStatu;
+	}
 	else
 		nButState = but_NormalStatu;
 }
 
 void Button::OnMouseUp(int x, int y)
 {
-	if (nButState == but_PressedStatu)
+	if (nButState == but_DisabledStatu)
+		return;
+	if (x >= GetBound().left() && x <= GetBound().right() && y >= GetBound().top() && y <= GetBound().bottom())
 	{
-		if (GetMouseEventCallBack() != NULL)
-		   GetMouseEventCallBack()(this,MOUSE_LBUTTONPRESS);
-		nButState = but_MouseStayStatu;
+		if (nButState == but_PressedStatu)
+		{
+			if (GetMouseDownCallBack() != NULL)
+				GetMouseDownCallBack()(this, MOUSE_LBUTTONPRESS);
+			nButState=but_MouseStayStatu;
+		}
 	}
+
 }
 
 StaticText::StaticText(char *pText)
@@ -168,6 +175,10 @@ void StaticText::Draw(SkCanvas* canvas)
 	SkPaint paint;
 	SkRect bounds;
 	font.measureText(text.c_str(), text.size(), kUTF8_SkTextEncoding, &bounds);
+
+	SkPaint paint2;
+	paint2.setColor(GetBackGroundColor());
+	canvas->drawRect(GetBound(),paint2);
 
 	int nDrawTextLength=text.size();
 	if (bounds.width() > GetWidth())

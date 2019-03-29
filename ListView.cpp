@@ -13,13 +13,16 @@ ListView::ListView()
 	vert_bar->set_controller(this);
 	hori_bar->set_controller(this);
 
-	background = SkColorSetRGB(255, 255, 255);
+	SetBackGroundColor(SkColorSetRGB(255, 255, 255));
 
 	SetScrolloffsX(0);
 	SetScrolloffsY(0);
 
 	header= new ListHead(this);
 	nAligment=ListAligment::LEFT;
+	mecallback=0;
+	sel_cellinfo.color=GetBackGroundColor();
+	//nViewStyle|=
 }
 
 void ListView::AddCol(ColumnInfo info)
@@ -108,16 +111,16 @@ void ListView::Draw(SkCanvas* canvas)
 	auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
     auto surfaceCanvas = gpuSurface->getCanvas();
 	SkPaint paint;
-	paint.setColor(background);
+	paint.setColor(GetBackGroundColor());
 	surfaceCanvas->drawRect(SkRect{ 0,0,GetDisplayWidth(),GetDisplayHeigth() }, paint);
 	int ins_y=0;
 	int ins_x=0;
 	fDrawTime=SkTime::GetMSecs();
 	displaylist.clear();
 
-	for (auto iter = rowlist.begin(); iter != rowlist.end(); iter++)
+	for (int row = 0; row< rowlist.size(); row++)
 	{
-		RowItem *currow=(*iter);
+		RowItem *currow=rowlist[row];
 	    ins_y+=currow->nRowHeigth;
 		if (ins_y >= (-ContentInfo.offs_y) && ins_y <= (-ContentInfo.offs_y) + GetDisplayHeigth()+currow->nRowHeigth)
 		{
@@ -156,6 +159,21 @@ void ListView::Draw(SkCanvas* canvas)
 					pChild->SetBound(left+5,top+5,rigth,bottom);
 					displaylist.push_back(pChild);
 
+
+					if (nViewStyle & LIST_STYLE_SIGNLESELCELL)
+					{
+						if (row == sel_cellinfo.nRow && nCol == sel_cellinfo.nCol)
+							pChild->SetBackGroundColor(sel_cellinfo.color);
+						else
+							pChild->SetBackGroundColor(GetBackGroundColor());
+					}
+					else
+					{
+						if (row == sel_cellinfo.nRow)
+							pChild->SetBackGroundColor(sel_cellinfo.color);
+						else
+							pChild->SetBackGroundColor(GetBackGroundColor());
+					}
 					pChild->Draw(surfaceCanvas);
 				}
 			}
@@ -210,6 +228,46 @@ void ListView::OnMouseMove(int x, int y)
 		pChild->OnMouseMove(point.x(), point.y());
 	}
 }
+
+void ListView::SetSelectedCellItemBackGround(SkColor color)
+{
+	sel_cellinfo.color=color;
+}
+
+CellSelectedInfo ListView::GetCellItemSelectedInfo(int x,int y)
+{
+	CellSelectedInfo selinfo;
+	selinfo.color=sel_cellinfo.color;
+	int ins_y=ContentInfo.offs_y;
+	int ins_x=ContentInfo.offs_x;
+	for (int k = 0; k < rowlist.size(); k++)
+	{
+		if (y >= ins_y && y <= ins_y + rowlist[k]->nRowHeigth)
+		{
+			selinfo.nRow=k;
+			break;
+		}
+		ins_y+=rowlist[k]->nRowHeigth;
+	}
+
+	if(selinfo.nRow==-1)
+		return selinfo;
+	for (int k = 0; k < collist.size(); k++)
+	{
+		if (x >= ins_x && x <= ins_x + collist[k].nWidth)
+		{
+			selinfo.nCol = k;
+				//printf("sel row=%d,col=%d\n",selinfo.nRow,selinfo.nCol);
+			break;
+		}
+		ins_x += collist[k].nWidth;
+	}
+
+	selinfo.pWidget=rowlist[selinfo.nRow]->celllist[selinfo.nCol].pWidget;
+	
+	return selinfo;
+}
+
 void ListView::OnMouseDown(int x, int y)
 {
 	
@@ -227,6 +285,8 @@ void ListView::OnMouseDown(int x, int y)
 	header->OnMouseDown(x,y);
 
 	SkPoint point=ScrollViewToChildPoint(x,y);
+
+	sel_cellinfo=GetCellItemSelectedInfo(point.x(),point.y());
 	for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
@@ -249,12 +309,72 @@ void ListView::OnMouseUp(int x, int y)
 		hori_bar->OnMouseUp(x, y);
 	}
 	header->OnMouseUp(x,y);
+	SkPoint point=ScrollViewToChildPoint(x,y);
+	CellSelectedInfo temp=GetCellItemSelectedInfo(point.x(),point.y());
+	if (mecallback != 0)
+	{
+		if (nViewStyle & LIST_STYLE_SIGNLESELCELL)
+		{
+			if (sel_cellinfo.nCol == temp.nCol && sel_cellinfo.nRow == temp.nRow)
+				mecallback(temp,MouseEvent::MOUSE_LBUTTONPRESS);
+			return;
+		}
+		if (sel_cellinfo.nRow == temp.nRow)
+		{
+			mecallback(temp, MouseEvent::MOUSE_LBUTTONPRESS);
+		}
+	}
 }
 void ListView::OnMouseWheel(float delta, uint32_t modifier)
 {
 	if(vert_bar==NULL || !vert_bar->IsVisible())
 		return;
 	ScrollToPosition(vert_bar,GetScrolloffsY()+delta*10);
+}
+
+void ListView::OnKey(sk_app::Window::Key key, uint32_t modifiers)
+{
+	if (key == sk_app::Window::Key::kDown && modifiers==0 /*sk_app::Window::kFirstPress_ModifierKey*/)
+	{
+		printf("on key modifiers=%d\n",modifiers);
+		if (sel_cellinfo.nCol == -1)
+		{
+			sel_cellinfo.nCol=0;
+			sel_cellinfo.nRow=0;
+		}
+		else
+		{
+			sel_cellinfo.nRow+=1;
+			sel_cellinfo.nRow=std::min((int)rowlist.size()-1,sel_cellinfo.nRow);
+
+			int ins_y=0;
+			for (int k = 0; k <= sel_cellinfo.nRow; k++)
+			{
+				ins_y+=rowlist[k]->nRowHeigth;
+			}
+			ins_y=ins_y+ContentInfo.offs_y;
+			if(ins_y>GetDisplayHeigth()-25)
+				ScrollToPosition(vert_bar, GetScrolloffsY() - 25);
+
+			/*if(sel_cellinfo.nRow*25<-GetScrolloffsY())
+			   ScrollToPosition(vert_bar, GetScrolloffsY() - 25);*/
+		}
+	}
+	if (key == sk_app::Window::Key::kUp  && modifiers==0)
+	{
+		sel_cellinfo.nRow-=1;
+		sel_cellinfo.nRow=std::max(0,sel_cellinfo.nRow);
+
+		int ins_y=0;
+		for (int k = 0; k <= sel_cellinfo.nRow; k++)
+		{
+			ins_y+=rowlist[k]->nRowHeigth;
+		}
+		ins_y=ins_y+ContentInfo.offs_y;
+		printf("ins_y=%d\n",ins_y);
+		if(ins_y<0+25)
+		  ScrollToPosition(vert_bar,GetScrolloffsY()+25);
+	}
 }
 
 SkScalar ListView::GetDisplayWidth()
@@ -405,3 +525,7 @@ void ListView::UpdateScrollBarInfo()
 	}
 }
 
+void ListView::SetCellItemMouseEvent(ListViewMouseEventCallBack fun)
+{
+	mecallback=fun;
+}

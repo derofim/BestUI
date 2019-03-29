@@ -2,11 +2,12 @@
 
 UIWidget::UIWidget()
 {
-	callbackf = NULL;
+	callback_mouse = NULL;
 	SetVisible(true);
 	fDegress = 0;
 	SetScrolloffsX(0);
 	SetScrolloffsY(0);
+	background = SkColorSetRGB(255, 255, 255);
 }
 void UIWidget::SetPosition(SkScalar x, SkScalar y)
 {
@@ -39,9 +40,9 @@ void UIWidget::StopAllAction()
 //	Sequence(this, callback);
 //}
 
-void UIWidget::SetMouseEventCallBack(MouseEventCallBack fu)
+void UIWidget::SetMouseEventCallBack(MouseCallBackFun fu)
 {
-	callbackf = fu;
+	callback_mouse = fu;
 }
 
 //void UIWidget::RunAction(Action *type)

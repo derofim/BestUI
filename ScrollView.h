@@ -56,8 +56,6 @@ public:
 	
 	void RemoveAllChildWidget();
 
-	void SetBackGroundColor(SkColor color);
-
 	void InitOffset();
 
 	void ScrollToPosition(ScrollBar* source, int position);
@@ -84,7 +82,6 @@ private:
 	std::vector<UIWidget *> childlist;
 
 	std::vector<UIWidget *> displaylist;
-	SkColor background;
 
 	ScrollBar *vert_bar;
 	ScrollBar *hori_bar;

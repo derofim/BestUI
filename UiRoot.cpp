@@ -95,3 +95,18 @@ void  UIRoot::OnMouseWheel(float delta, uint32_t modifier)
 			break;
 	}
 }
+
+void UIRoot::OnKey(sk_app::Window::Key key, uint32_t modifiers)
+{
+	if (GetWidgetList()->size() == 0)
+		return;
+	for (auto iter = GetWidgetList()->end() - 1; ; iter--)
+	{
+		UIWidget *pWidget = *iter;
+		pWidget->OnKey(key, modifiers);
+		/*if (x >= pWidget->GetBound().left() && x <= pWidget->GetBound().right() && y >= pWidget->GetBound().top() && y <= pWidget->GetBound().bottom())
+			return;*/
+		if (iter == GetWidgetList()->begin())
+			break;
+	}
+}

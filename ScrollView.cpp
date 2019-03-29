@@ -4,14 +4,15 @@ ScrollView::ScrollView()
 {
 	SetPosition(0, 0);
 	SetSize(0, 0);
-//	nDirectionType = Direction::Vertical;
+
 	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
-	background = SkColorSetRGB(255, 255, 255);
+	SetBackGroundColor(SkColorSetRGB(255, 255, 255));
 	vert_bar = new ScrollBar(Direction::Vertical);
 	hori_bar = new ScrollBar(Direction::Horizontal);
 	vert_bar->set_controller(this);
 	hori_bar->set_controller(this);
 	llDrawTick=0;
+	
 }
 
 //void ScrollView::Draw(SkCanvas* canvas)
@@ -125,7 +126,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 	auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
     auto surfaceCanvas = gpuSurface->getCanvas();
 	SkPaint paint;
-	paint.setColor(background);
+	paint.setColor(GetBackGroundColor());
 	surfaceCanvas->drawRect(SkRect{ 0,0,GetWidth(),GetHeight() }, paint);
 
 	for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
@@ -363,10 +364,6 @@ void ScrollView::SetContentSize(SkScalar width, SkScalar height)
 	}
 }
 
-void ScrollView::SetBackGroundColor(SkColor color)
-{
-	background = color;
-}
 
 
 

@@ -25,7 +25,7 @@ public:
     void onPaint(SkCanvas* canvas) override;
     bool onChar(SkUnichar c, uint32_t modifiers) override;
 	bool onMouse(int x, int y, sk_app::Window::InputState state, uint32_t modifiers) override;
-
+	bool onKey(sk_app::Window::Key key, sk_app::Window::InputState state, uint32_t modifiers)  override;
 	bool onMouseWheel(float delta, uint32_t modifiers) override;
 
 	void ClickCallback(UIWidget *pWidget,MouseEvent ev);

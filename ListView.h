@@ -28,6 +28,9 @@ struct ColumnInfo {
 #define LIST_STYLE_HEAD        1
 #define LIST_STYLE_VERTGLINE   2   
 #define LIST_STYLE_HORZGLINE   4  
+#define LIST_STYLE_SIGNLESELCELL  8
+//#define LIST_STYLE_FULLLINE    8
+
 
 class RowItem {
 public:
@@ -41,6 +44,16 @@ struct SortDescriptor
 	int nCol=-1;
 	bool ascending=false;
 };
+
+struct CellSelectedInfo 
+{
+	UIWidget *pWidget=0;
+	int nRow=-1;
+	int nCol=-1;
+	SkColor color;
+};
+
+typedef std::function<void(CellSelectedInfo selcell,MouseEvent ev)> ListViewMouseEventCallBack;
 
 class ListHead;
 class ListView :public UIWidget ,public ScrollBarController 
@@ -59,7 +72,7 @@ public:
 	void OnMouseDown(int x, int y) override;
 	void OnMouseUp(int x,int y) override;
 	void OnMouseWheel(float delta, uint32_t modifier) override;
-
+	void OnKey(sk_app::Window::Key key, uint32_t modifiers) override;
 	void AddCol(ColumnInfo info);
 	void AddCol(char *name,int nWidth);
 
@@ -70,6 +83,9 @@ public:
 
 	void CellItemUpdate(UIWidget *pWidget,int nRow,int nCol);
 	void CellItemUpdate(SkString text,int nRow,int nCol);
+
+	CellSelectedInfo GetCellItemSelectedInfo(int x,int y);
+
 
 	void DelRow(int nRow);
 	void DelAllRow();
@@ -102,6 +118,11 @@ public:
 
 	SkPoint ScrollViewToChildPoint(int x, int y);
 
+
+	void SetCellItemMouseEvent(ListViewMouseEventCallBack fun);
+
+	void SetSelectedCellItemBackGround(SkColor color);
+
 	std::vector<ColumnInfo> GetColList()
 	{
 		return collist;
@@ -113,7 +134,6 @@ private:
 	ScrollBar *hori_bar;
 
 	ListHead *header;
-	SkColor background;
 	std::vector<UIWidget *> displaylist;
 
 	std::vector<RowItem *> rowlist;
@@ -125,4 +145,6 @@ private:
 	std::map<int,SortDescriptor> sortdescMap;
 	int nViewStyle;
 	ListAligment nAligment;
+	CellSelectedInfo  sel_cellinfo;
+	ListViewMouseEventCallBack mecallback;
 };
