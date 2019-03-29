@@ -153,10 +153,12 @@ void ListView::Draw(SkCanvas* canvas)
 						p2.set(ins_x + ContentInfo.offs_x, bottom);
 						paint.setColor(SkColorSetRGB(30, 30, 30));
 						surfaceCanvas->drawLine(p1, p2, paint);
-						bottom-=1;
+						if(row>0)
+						    top+=1;
+					
 					}
 
-					pChild->SetBound(left+5,top+5,rigth,bottom);
+					pChild->SetBound(left,top,rigth,bottom);
 					displaylist.push_back(pChild);
 
 
@@ -334,7 +336,7 @@ void ListView::OnMouseWheel(float delta, uint32_t modifier)
 
 void ListView::OnKey(sk_app::Window::Key key, uint32_t modifiers)
 {
-	if (key == sk_app::Window::Key::kDown && modifiers==0 /*sk_app::Window::kFirstPress_ModifierKey*/)
+	if (key == sk_app::Window::Key::kDown && modifiers==0)
 	{
 		printf("on key modifiers=%d\n",modifiers);
 		if (sel_cellinfo.nCol == -1)
@@ -374,6 +376,23 @@ void ListView::OnKey(sk_app::Window::Key key, uint32_t modifiers)
 		printf("ins_y=%d\n",ins_y);
 		if(ins_y<0+25)
 		  ScrollToPosition(vert_bar,GetScrolloffsY()+25);
+	}
+	if (key == sk_app::Window::Key::kLeft && modifiers == 0)
+	{
+		if (nViewStyle & LIST_STYLE_SIGNLESELCELL)
+		{
+			return;
+		}
+		ScrollToPosition(hori_bar,GetScrolloffsX()+50);
+	}
+
+	if (key == sk_app::Window::Key::kRight && modifiers == 0)
+	{
+		if (nViewStyle & LIST_STYLE_SIGNLESELCELL)
+		{
+			return;
+		}
+		ScrollToPosition(hori_bar,GetScrolloffsX()-50);
 	}
 }
 
