@@ -20,7 +20,8 @@ struct CellItem {
 
 
 struct ColumnInfo {
-	int nOrder;
+	int nInitOrder;
+	int nShowOrder;
 	int nWidth;
 	SkString colname;
 };
@@ -67,6 +68,7 @@ public:
 		RIGHT
 	};
 	ListView();
+	~ListView();
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
@@ -89,6 +91,9 @@ public:
 
 	void DelRow(int nRow);
 	void DelAllRow();
+
+	void DelCol(int nCol);
+	void DelAllCol();
 
 	void SetListViewRow(int nRow);
 

@@ -25,6 +25,17 @@ ListView::ListView()
 	//nViewStyle|=
 }
 
+ListView::~ListView()
+{
+	DelAllCol();
+	if(vert_bar!=NULL)
+		delete vert_bar;
+	if(hori_bar!=NULL)
+		delete hori_bar;
+	if(header!=NULL)
+		delete header;
+}
+
 void ListView::AddCol(ColumnInfo info)
 {
 	collist.push_back(info);
@@ -34,7 +45,8 @@ void ListView::AddCol(char * name, int nWidth)
 	ColumnInfo info;
 	info.colname=name;
 	info.nWidth=nWidth;
-	info.nOrder=collist.size();
+	info.nInitOrder=collist.size();
+	info.nShowOrder=info.nInitOrder;
 	collist.push_back(info);
 
 	Button *but=new Button();
@@ -85,13 +97,84 @@ void ListView::CellItemUpdate(SkString text,int nRow,int nCol)
 
 void ListView::DelRow(int nRow)
 {
+	//warring ,may be delete row failed
+	if(rowlist.size()<=nRow)
+		return;
+	int nRowHei= rowlist[nRow]->nRowHeigth;
+
+	for (int k = 0; k < rowlist[nRow]->celllist.size(); k++)
+	{
+		if(rowlist[nRow]->celllist[k].pWidget!=0)
+			delete rowlist[nRow]->celllist[k].pWidget;
+	}
+	rowlist[nRow]->celllist.clear();
+	delete rowlist[nRow];
+	rowlist.erase(rowlist.begin()+nRow);
+	
+	ContentInfo.height-=nRowHei;
+	UpdateScrollBarInfo();
+
 }
 
 void ListView::DelAllRow()
 {
+	/*for (int nRow = 0; nRow < rowlist.size(); nRow++)
+	{
+		printf("row size=%d\n",rowlist.size());
+		DelRow(rowlist.size()-1);
+	}
+	return;*/
+	for (int nRow = 0; nRow < rowlist.size(); nRow++)
+	{
+		for (int k = 0; k < rowlist[nRow]->celllist.size(); k++)
+	    {
+		    if(rowlist[nRow]->celllist[k].pWidget!=0)
+			    delete rowlist[nRow]->celllist[k].pWidget;
+	    }
+	    rowlist[nRow]->celllist.clear();
+		delete rowlist[nRow];
+	}
+	rowlist.clear();
+	ContentInfo.height=0;
+	UpdateScrollBarInfo();
+}
+
+void ListView::DelCol(int nCol)
+{
+	int nDelIndex=-1;
+	for (int k = 0; k < collist.size(); k++)
+	{
+		if (collist[k].nShowOrder == nCol)
+		{
+			nDelIndex = k;
+			break;
+		}
+	}
+	if(nDelIndex==-1)
+		return;
+
+	for (int nRow = 0; nRow < rowlist.size(); nRow++)
+	{
+		if(rowlist[nRow]->celllist[nDelIndex].pWidget!=0)
+			delete rowlist[nRow]->celllist[nDelIndex].pWidget;
+
+		rowlist[nRow]->celllist.erase(rowlist[nRow]->celllist.begin()+nDelIndex);
+	}
+	int nColWidth=collist[nDelIndex].nWidth;
+	collist.erase(collist.begin()+nDelIndex);
+	ContentInfo.width-=nColWidth;
+	UpdateScrollBarInfo();
 }
 
 
+void ListView::DelAllCol()
+{
+	DelAllRow();
+	collist.clear();
+	ContentInfo.height=0;
+	ContentInfo.width=0;
+	UpdateScrollBarInfo();
+}
 
 void ListView::Draw(SkCanvas* canvas) 
 {
@@ -381,6 +464,20 @@ void ListView::OnKey(sk_app::Window::Key key, uint32_t modifiers)
 	{
 		if (nViewStyle & LIST_STYLE_SIGNLESELCELL)
 		{
+
+			sel_cellinfo.nCol-=1;
+			sel_cellinfo.nCol=std::max(0,sel_cellinfo.nCol);
+
+			int ins_x=0;
+		    for (int k = 0; k <= sel_cellinfo.nCol; k++)
+		    {
+			    ins_x+=collist[k].nWidth;
+		    }
+		    ins_x=ins_x+ContentInfo.offs_x;
+		   // printf("ins_x=%d\n",ins_x);
+
+			if(ins_x<collist[sel_cellinfo.nCol].nWidth)
+			   ScrollToPosition(hori_bar, GetScrolloffsX()+collist[sel_cellinfo.nCol].nWidth);
 			return;
 		}
 		ScrollToPosition(hori_bar,GetScrolloffsX()+50);
@@ -390,6 +487,26 @@ void ListView::OnKey(sk_app::Window::Key key, uint32_t modifiers)
 	{
 		if (nViewStyle & LIST_STYLE_SIGNLESELCELL)
 		{
+			if (sel_cellinfo.nCol == -1)
+		    {
+			    sel_cellinfo.nCol=0;
+			    sel_cellinfo.nRow=0;
+		    }
+			else
+			{
+				sel_cellinfo.nCol+=1;
+			    sel_cellinfo.nCol=std::min((int)collist.size()-1,sel_cellinfo.nCol);
+
+				int ins_x=0;
+		        for (int k = 0; k <= sel_cellinfo.nCol; k++)
+		        {
+			        ins_x+=collist[k].nWidth;
+		        }
+		        ins_x=ins_x+ContentInfo.offs_x;
+		    //    printf("ins_x=%d\n",ins_x);
+				if(ins_x>GetDisplayWidth()-collist[sel_cellinfo.nCol].nWidth)
+				  ScrollToPosition(hori_bar, GetScrolloffsX() - collist[sel_cellinfo.nCol].nWidth);
+			}
 			return;
 		}
 		ScrollToPosition(hori_bar,GetScrolloffsX()-50);
@@ -399,7 +516,7 @@ void ListView::OnKey(sk_app::Window::Key key, uint32_t modifiers)
 SkScalar ListView::GetDisplayWidth()
 {
 	SkScalar width=GetBound().width();
-	if (ContentInfo.height > GetBound().height() && vert_bar->IsVisible())
+	if (ContentInfo.height > GetBound().height()-header->GetHeight() && vert_bar->IsVisible())
 		width-=vert_bar->GetWidth();
 	return width;
 }
@@ -484,6 +601,10 @@ void ListView::SetViewStyle(int nStyle)
 	{
 		header->SetBound(GetBound().left(),GetBound().top(),GetDisplayWidth()+GetBound().left(),25+GetBound().top());
 	}
+	else
+	{
+		header->SetBound(0,0,0,0);
+	}
 }
 
 
@@ -513,11 +634,16 @@ void ListView::UpdateScrollBarInfo()
 		barinfo.ContentSize=ContentInfo.height;
 		barinfo.DisplaySize=vert_bar->GetHeight();
 		barinfo.offset=ContentInfo.offs_y;
+		SkScalar ContentMoveMax=barinfo.ContentSize-barinfo.DisplaySize;
+		barinfo.offset=std::max(barinfo.offset,-ContentMoveMax);
+		SetScrolloffsY(barinfo.offset);
 		vert_bar->SetScrollBarInfo(barinfo);
 	}
 	else
 	{
 		vert_bar->SetBound(0,0,0,0);
+		SetScrolloffsY(0);
+		vert_bar->SetVisible(false);
 	}
 
 	if (ContentInfo.width > GetDisplayWidth())
@@ -536,11 +662,17 @@ void ListView::UpdateScrollBarInfo()
 		barinfo.ContentSize=ContentInfo.width;
 		barinfo.DisplaySize=hori_bar->GetWidth();
 		barinfo.offset=ContentInfo.offs_x;
+
+		SkScalar ContentMoveMax=barinfo.ContentSize-barinfo.DisplaySize;
+		barinfo.offset=std::max(barinfo.offset,-ContentMoveMax);
+		SetScrolloffsX(barinfo.offset);
 		hori_bar->SetScrollBarInfo(barinfo);
 	}
 	else
 	{
 		hori_bar->SetBound(0,0,0,0);
+		SetScrolloffsX(0);
+		hori_bar->SetVisible(false);
 	}
 }
 
