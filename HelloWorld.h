@@ -31,8 +31,10 @@ public:
 	void ClickCallback(UIWidget *pWidget,MouseEvent ev);
 	void TestTimer();
 	void TestTimer2();
+	void InitUi();
 	void TestScrollView();
 	void TestListView();
+	void TestTextField();
 private:
     void updateTitle();
 

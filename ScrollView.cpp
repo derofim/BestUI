@@ -98,7 +98,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 	//long long llInitStamp=GetTickCount64();
 
 	fDrawTime=SkTime::GetMSecs();
-	if (diff_y != 0 || diff_x != 0 || llDrawTick%30==0 )
+	if (diff_y != 0 || diff_x != 0 || llDrawTick%20==0)
 	{
 		
 		displaylist.clear();
@@ -122,7 +122,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 	ContentInfo.preoffs_y = ContentInfo.offs_y;
 	ContentInfo.preoffs_x = ContentInfo.offs_x;
 	GrContext* context = canvas->getGrContext();
-	SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
+	SkImageInfo info = SkImageInfo::MakeN32(GetDisplayWidth(), GetDisplayHeigth(), kOpaque_SkAlphaType);
 	auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
     auto surfaceCanvas = gpuSurface->getCanvas();
 	SkPaint paint;
@@ -134,8 +134,12 @@ void ScrollView::Draw(SkCanvas* canvas)
 		UIWidget *pChild = *iter;
 		pChild->Draw(surfaceCanvas);
 	}
-
+	UpdateScrollBarInfo();
 	if (vert_bar != NULL)
+		vert_bar->Draw(canvas);
+	if (hori_bar != NULL)
+		hori_bar->Draw(canvas);
+	/*if (vert_bar != NULL)
 	{
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.height;
@@ -153,7 +157,7 @@ void ScrollView::Draw(SkCanvas* canvas)
 		barinfo.offset=ContentInfo.offs_x;
 		hori_bar->SetScrollBarInfo(barinfo);
 		hori_bar->Draw(surfaceCanvas);
-	}
+	}*/
 	
 	sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
 	canvas->drawImage(image, GetBound().left(), GetBound().top());
@@ -166,13 +170,13 @@ void ScrollView::Draw(SkCanvas* canvas)
 
 void ScrollView::OnMouseMove(int x, int y)
 {
-	SkPoint point=ScrollViewToChildPoint(x,y);
+
 	if (vert_bar != NULL && vert_bar->IsVisible())
-		vert_bar->OnMouseMove(point.x(), point.y());
+		vert_bar->OnMouseMove(x, y);
 
 	if (hori_bar != NULL && hori_bar->IsVisible())
-		hori_bar->OnMouseMove(point.x(), point.y());
-
+		hori_bar->OnMouseMove(x, y);
+	SkPoint point=ScrollViewToChildPoint(x,y);
 	/*if (point.x() >= vert_bar->GetBound().left() && point.x() <= vert_bar->GetBound().right() && point.y() >= vert_bar->GetBound().top() && point.y() <= vert_bar->GetBound().bottom())
 		return;
 	if (point.x() >= hori_bar->GetBound().left() && point.x() <= hori_bar->GetBound().right() && point.y() >= hori_bar->GetBound().top() && point.y() <= hori_bar->GetBound().bottom())
@@ -192,18 +196,18 @@ void ScrollView::OnMouseMove(int x, int y)
 
 void  ScrollView::OnMouseDown(int x, int y)
 {
-	SkPoint point=ScrollViewToChildPoint(x,y);
 	if (vert_bar != NULL)
 	{
-		if (point.x() >= vert_bar->GetBound().left() && point.x() <= vert_bar->GetBound().right() && point.y() >= vert_bar->GetBound().top() && point.y() <= vert_bar->GetBound().bottom())
-		  return  vert_bar->OnMouseDown(point.x(), point.y());
+		if (x >= vert_bar->GetBound().left() && x <= vert_bar->GetBound().right() && y >= vert_bar->GetBound().top() && y <= vert_bar->GetBound().bottom())
+		  return  vert_bar->OnMouseDown(x, y);
 	}
 
 	if (hori_bar != NULL && hori_bar->IsVisible())
 	{
-		if (point.x() >= hori_bar->GetBound().left() && point.x() <= hori_bar->GetBound().right() && point.y() >= hori_bar->GetBound().top() && point.y() <= hori_bar->GetBound().bottom())
-		   return  hori_bar->OnMouseDown(point.x(), point.y());
+		if (x >= hori_bar->GetBound().left() && x <= hori_bar->GetBound().right() && y >= hori_bar->GetBound().top() && y <= hori_bar->GetBound().bottom())
+		   return  hori_bar->OnMouseDown(x, y);
 	}
+	SkPoint point=ScrollViewToChildPoint(x,y);
 	for (auto iter = displaylist.begin(); iter != displaylist.end(); iter++)
 	{
 		UIWidget *pChild = *iter;
@@ -221,14 +225,13 @@ void  ScrollView::OnMouseDown(int x, int y)
 
 void ScrollView::OnMouseUp(int x, int y)
 {
-	SkPoint point=ScrollViewToChildPoint(x,y);
 	if (vert_bar != NULL && vert_bar->IsVisible())
 	{
-		vert_bar->OnMouseUp(point.x(), point.y());
+		vert_bar->OnMouseUp(x, y);
 	}
 	if (hori_bar != NULL && hori_bar->IsVisible())
 	{
-		hori_bar->OnMouseUp(point.x(), point.y());
+		hori_bar->OnMouseUp(x, y);
 	}
 }
 
@@ -325,45 +328,84 @@ SkScalar ScrollView::GetDisplayWidth()
 {
 	SkScalar width=GetBound().width();
 	if (ContentInfo.height > GetBound().height() && vert_bar->IsVisible())
-		width-=/*vert_bar->GetWidth()*/10;
+		width-=vert_bar->GetWidth();
 	return width;
 }
 SkScalar ScrollView::GetDisplayHeigth() 
 {
 	SkScalar heigth=GetBound().height();
 	if (ContentInfo.width > GetBound().width() && hori_bar->IsVisible())
-		heigth-=/*hori_bar->GetHeight()*/10;
+		heigth-=hori_bar->GetHeight();
 	return heigth;
 }
-
 
 void ScrollView::SetContentSize(SkScalar width, SkScalar height)
 {
 	ContentInfo.height = height;
 	ContentInfo.width = width;
-	if (ContentInfo.height > GetBound().height())
+	UpdateScrollBarInfo();
+}
+
+
+
+void ScrollView::UpdateScrollBarInfo()
+{
+	if (ContentInfo.height > GetDisplayHeigth())
 	{
-		vert_bar->SetPosition(GetBound().width()-10,0);
-		vert_bar->SetSize(10,GetDisplayHeigth());
+		if (vert_bar->GetWidth() == 0)
+		{
+			vert_bar->SetPosition(GetBound().width()-BAR_VER_WIDTH+GetBound().left(),GetBound().top());
+			vert_bar->SetSize(BAR_VER_WIDTH,GetDisplayHeigth());
+		}
+		else
+		{
+			vert_bar->SetPosition(GetBound().width()-vert_bar->GetBound().width()+GetBound().left(),GetBound().top());
+			vert_bar->SetSize(vert_bar->GetBound().width(),GetDisplayHeigth());
+		}
+
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.height;
 		barinfo.DisplaySize=vert_bar->GetHeight();
-		barinfo.offset=0;
+		barinfo.offset=ContentInfo.offs_y;
+		SkScalar ContentMoveMax=barinfo.ContentSize-barinfo.DisplaySize;
+		barinfo.offset=std::max(barinfo.offset,-ContentMoveMax);
+		SetScrolloffsY(barinfo.offset);
 		vert_bar->SetScrollBarInfo(barinfo);
 	}
-
-	if (ContentInfo.width > GetBound().width())
+	else
 	{
-		hori_bar->SetPosition(0,GetBound().height()-10);
-		hori_bar->SetSize(GetDisplayWidth(),10);
+		vert_bar->SetBound(0,0,0,0);
+		SetScrolloffsY(0);
+	}
+
+	if (ContentInfo.width > GetDisplayWidth())
+	{
+		if (hori_bar->GetWidth() == 0)
+		{
+			hori_bar->SetPosition(GetBound().left(), GetBound().bottom()-BAR_HORI_HEIGHT);
+			hori_bar->SetSize(GetDisplayWidth(), BAR_HORI_HEIGHT);
+		}
+		else
+		{
+			hori_bar->SetPosition(GetBound().left(),GetBound().bottom()-hori_bar->GetBound().height());
+			hori_bar->SetSize(GetDisplayWidth(), hori_bar->GetBound().height());
+		}
 		ScrollBarInfo barinfo;
 		barinfo.ContentSize=ContentInfo.width;
 		barinfo.DisplaySize=hori_bar->GetWidth();
-		barinfo.offset=0;
+		barinfo.offset=ContentInfo.offs_x;
+
+		SkScalar ContentMoveMax=barinfo.ContentSize-barinfo.DisplaySize;
+		barinfo.offset=std::max(barinfo.offset,-ContentMoveMax);
+		SetScrolloffsX(barinfo.offset);
 		hori_bar->SetScrollBarInfo(barinfo);
 	}
+	else
+	{
+		hori_bar->SetBound(0,0,0,0);
+		SetScrolloffsX(0);
+	}
 }
-
 
 
 

@@ -110,3 +110,16 @@ void UIRoot::OnKey(sk_app::Window::Key key, uint32_t modifiers)
 			break;
 	}
 }
+
+void UIRoot::OnChar(SkUnichar c, uint32_t modifiers)
+{
+	if (GetWidgetList()->size() == 0)
+		return;
+	for (auto iter = GetWidgetList()->end() - 1; ; iter--)
+	{
+		UIWidget *pWidget = *iter;
+		pWidget->OnChar(c, modifiers);
+		if (iter == GetWidgetList()->begin())
+			break;
+	}
+}

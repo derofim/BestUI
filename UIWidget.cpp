@@ -89,3 +89,18 @@ void UIShard::KillTimer(TimerCallBackFun fun)
 {
 	pTimerManage->KillTimer(fun);
 }
+
+void UIShard::RemoveWidget(UIWidget *pWidget)
+{
+	for (auto iter = pWidgetList->begin(); iter != pWidgetList->end();)
+	{
+		if (*iter == pWidget)
+		{
+			iter = pWidgetList->erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+}

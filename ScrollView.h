@@ -28,7 +28,7 @@ public:
 
 	
 	ScrollView();
-
+	~ScrollView() {};
 	void Draw(SkCanvas* canvas) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseDown(int x, int y) override;
@@ -51,6 +51,7 @@ public:
 	void JumpRight();*/
 
 	void SetContentSize(SkScalar width, SkScalar height);
+	void UpdateScrollBarInfo();
 
 	//void SetDirection(Direction nType);
 	

@@ -41,6 +41,7 @@ public:
 	void AddWidget(UIWidget *pWidget, int nShowOrder=0);
 	void SetTimer(TimerCallBackFun fun, double fElapse);
 	void KillTimer(TimerCallBackFun fun);
+	void RemoveWidget(UIWidget *pWidget);
 	ActionManage *GetActionManage()
 	{
 		return pActionManage;
@@ -80,7 +81,7 @@ public:
 	virtual void OnMouseWheel(float delta, uint32_t modifier)=0;
 
 	virtual void OnKey(sk_app::Window::Key key, uint32_t modifiers) {};
-
+	virtual void OnChar(SkUnichar c, uint32_t modifiers) {};
 	void SetMouseEventCallBack(MouseCallBackFun fu);
 	SkScalar GetWidth()
 	{

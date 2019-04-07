@@ -34,6 +34,7 @@ ListView::~ListView()
 		delete hori_bar;
 	if(header!=NULL)
 		delete header;
+	RemoveWidget(this);
 }
 
 void ListView::AddCol(ColumnInfo info)
@@ -643,7 +644,6 @@ void ListView::UpdateScrollBarInfo()
 	{
 		vert_bar->SetBound(0,0,0,0);
 		SetScrolloffsY(0);
-		vert_bar->SetVisible(false);
 	}
 
 	if (ContentInfo.width > GetDisplayWidth())
@@ -672,7 +672,6 @@ void ListView::UpdateScrollBarInfo()
 	{
 		hori_bar->SetBound(0,0,0,0);
 		SetScrolloffsX(0);
-		hori_bar->SetVisible(false);
 	}
 }
 

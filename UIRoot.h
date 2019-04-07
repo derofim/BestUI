@@ -21,6 +21,7 @@ public:
 
 	void OnMouseWheel(float delta, uint32_t modifiers);
 	void OnKey(sk_app::Window::Key key, uint32_t modifiers);
+	void OnChar(SkUnichar c, uint32_t modifiers);
 private:
 	//std::vector<UIWidget *> widgetlist;
 };
