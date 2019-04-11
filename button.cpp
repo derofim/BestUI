@@ -159,6 +159,8 @@ void Button::OnMouseUp(int x, int y)
 StaticText::StaticText(char *pText)
 {
 	text = pText;
+    SetPosition(0, 0);
+    SetSize(0, 0);
 }
 StaticText::~StaticText()
 {
