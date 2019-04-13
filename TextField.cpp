@@ -1,27 +1,31 @@
-#include "TextField.h"
+﻿#include "TextField.h"
 #include "windows.h"
 #pragma comment(lib, "Imm32.lib")
-//extern HWND hwnd;
+
 HIMC imm_context;
-TextField::TextField() {
+TextField::TextField() 
+{
     SetBackGroundColor(SkColorSetRGB(230, 230, 230));
     text_color = SkColorSetRGB(0, 0, 0);
 
-  //  imm_context = ::ImmGetContext(hwnd);
-   // CANDIDATEFORM exclude_rectangle = {0, CFS_EXCLUDE, {500, 500}, {200, 100, 500, 200}};
-   // ImmSetCandidateWindow(imm_context, &exclude_rectangle);
+    //imm_context = ::ImmGetContext(hwnd);
+    //CANDIDATEFORM exclude_rectangle = {0, CFS_EXCLUDE, {500, 500}, {200, 100, 500, 200}};
+    //ImmSetCandidateWindow(imm_context, &exclude_rectangle);
     unindex = 0;
     TextLine info;
     info.nHeight = 20;
     line.push_back(info);
     fCurPosBlinkTime = SkTime::GetMSecs();
 }
-TextField::~TextField() {}
+TextField::~TextField() 
+{
+}
 
 // HIMC imm_context = ::ImmGetContext(window_handle);
 //::ImmSetCandidateWindow(imm_context, &exclude_rectangle);
 #include "SkTextBlob.h"
-void TextField::Draw(SkCanvas* canvas) {
+void TextField::Draw(SkCanvas* canvas) 
+{
     GrContext* context = canvas->getGrContext();
     SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
     auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
@@ -35,15 +39,13 @@ void TextField::Draw(SkCanvas* canvas) {
     font.setSubpixel(true);
     font.setSize(16);
 
-    for (int k = 0; k < line.size(); k++) {
+    for (int k = 0; k < line.size(); k++) 
+	{
         paint.setColor(SkColorSetRGB(0, 0, 0));
 
         std::wstring* ptext = GetLineText(k);
-        surfaceCanvas->drawSimpleText(ptext->c_str(), ptext->size() * 2, kUTF16_SkTextEncoding,
-                                      ins_x, ins_y, font, paint);
+        surfaceCanvas->drawSimpleText(ptext->c_str(), ptext->size() * 2, kUTF16_SkTextEncoding,ins_x, ins_y, font, paint);
         ins_y += line[k].nHeight;
-        // font.measureText(textlist.c_str(),textlist.size(), kUTF8_SkTextEncoding, &bounds,
-        // &paint); ins_x+=/*bounds.width()*/30+0.5;
     }
 
     DrawCurPosBlink(surfaceCanvas);
@@ -52,55 +54,13 @@ void TextField::Draw(SkCanvas* canvas) {
     }, new DelayTime(1.0), 0);
     sq.RunSequence();*/
 
-    //
-    //	SkTextBlobBuilder builder;
-    //  const auto& run_buffer = builder.allocRunPos(font, textlist.size());
-    //
-    //  //static_assert(sizeof(*glyphs) == sizeof(*run_buffer.glyphs), "");
-    //  memcpy(run_buffer.glyphs, textlist.c_str(), textlist.size());
-    //
-    ////  static_assert(sizeof(*pos) == 2 * sizeof(*run_buffer.pos), "");
-    //  memcpy(run_buffer.pos, 0, textlist.size() );
-    //  surfaceCanvas->drawTextBlob(builder.make(), 0, 0, paint);
-
-    // for (int k = 0; k < textlist.size(); k++)
-    //{
-    //	if (textlist[k].text == 0x0a)
-    //	{
-    //		inx_y+=20;
-    //	}
-    //	paint.setColor(textlist[k].color);
-    //	SkRect bounds;
-    //	if (textlist[k].text < 128)
-    //	{
-    //		//font.measureText(&textlist[k].text, 1, kUTF8_SkTextEncoding, &bounds, &paint);
-    //		// paint.textToGlyphs(bunny, len, glyphs);
-    //		 uint16_t glyphs[2];
-    //		font.textToGlyphs(&textlist[k].text, 1, kUTF8_SkTextEncoding,&glyphs[0],1);
-
-    //		surfaceCanvas->drawSimpleText(&textlist[k].text, 1, kUTF8_SkTextEncoding, ins_x, inx_y,
-    //font, paint);
-    //	}
-    //	else
-    //	{
-    //		char pszText[30]="hello world\r\ntest enter\r\n";
-    //		/*pszText[0]=0xe5;
-    //		pszText[1]=0xae;
-    //		pszText[2]=0x8c;
-    //		pszText[3]=0x00;*/
-    //		font.measureText(pszText, strlen(pszText), kUTF8_SkTextEncoding, &bounds, &paint);
-    //		surfaceCanvas->drawSimpleText(pszText ,strlen(pszText), kUTF8_SkTextEncoding, ins_x,
-    //inx_y, font, paint);
-    //	}
-    //	ins_x+=bounds.width()+0.5;
-    //	//printf("char width=%f\n",bounds.width());
-    //}
     paint.setColor(GetBackGroundColor());
     sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
     canvas->drawImage(image, GetBound().left(), GetBound().top());
 }
 
-void TextField::DrawCurPosBlink(SkCanvas* canvas) {
+void TextField::DrawCurPosBlink(SkCanvas* canvas) 
+{
     // double diff = SkTime::GetMSecs() - fCurPosBlinkTime;
     // printf("diff=%f\n", diff);
     // if (SkTime::GetMSecs() - fCurPosBlinkTime >= 100)
@@ -125,9 +85,42 @@ void TextField::DrawCurPosBlink(SkCanvas* canvas) {
     }
 }
 
-void TextField::OnMouseMove(int x, int y) {}
+void TextField::OnMouseMove(int x, int y) 
+{
+}
 
-void TextField::OnMouseDown(int x, int y) {
+int TextField::FindSuitX(std::wstring text, int nCmpX) 
+{
+    int k;
+    SkPaint paint;
+    SkFont font;
+    font.setSubpixel(true);
+    font.setSize(16);
+    SkRect bounds;
+    for (k = 0; k < text.length(); k++) 
+	{
+        font.measureText(text.c_str(), (k + 1) * 2, kUTF16_SkTextEncoding, &bounds, &paint);
+        if (nCmpX < bounds.width()) 
+		{
+            break;
+        }
+    }
+    return k;
+}
+void TextField::SetLastX() 
+{
+    SkPaint paint;
+    SkFont font;
+    font.setSubpixel(true);
+    font.setSize(16);
+    SkRect bounds;
+    std::wstring* ptext = GetLineText(curpos.y);
+    font.measureText(ptext->c_str(), curpos.x * 2, kUTF16_SkTextEncoding, &bounds, &paint);
+    nLastX = bounds.width();
+}
+
+void TextField::OnMouseDown(int x, int y) 
+{
     SkPoint point = ScrollViewToChildPoint(x, y);
 
     if (point.y() > line.size() * 20) return;
@@ -141,27 +134,77 @@ void TextField::OnMouseDown(int x, int y) {
     SkRect bounds;
 
     int k;
-    for (k = 0; k < ptext->length(); k++) {
+    for (k = 0; k < ptext->length(); k++) 
+	{
         font.measureText(ptext->c_str(), (k + 1) * 2, kUTF16_SkTextEncoding, &bounds, &paint);
-        if (point.x() < bounds.width()) {
+        if (point.x() < bounds.width()) 
+		{
             break;
         }
     }
     curpos.x = k;
     curpos.y = nIndex;
+
+    nLastX = point.x();
 }
 
-void TextField::OnMouseUp(int x, int y) {}
+void TextField::OnMouseUp(int x, int y) 
+{
+}
 
-void TextField::OnMouseWheel(float delta, uint32_t modifier) {}
+void TextField::OnMouseWheel(float delta, uint32_t modifier) 
+{
+}
 
-void TextField::OnKey(sk_app::Window::Key key, uint32_t modifiers) {
-    if (key != sk_app::Window::Key::kBack) {
-        //	printf("del back key\n");
-        /*TextDesc desc;
-        desc.text=(char)key;
-        desc.color=text_color;
-        textlist.push_back(desc);*/
+void TextField::OnKey(sk_app::Window::Key key, uint32_t modifiers) 
+{
+    if (key == sk_app::Window::Key::kDown && modifiers == 0) 
+	{
+        // printf("on key modifiers=%d\n", modifiers);
+        curpos.y++;
+        curpos.y = std::min((int)line.size() - 1, curpos.y);
+        std::wstring* ptext = GetLineText(curpos.y);
+        curpos.x = FindSuitX(*ptext, nLastX);
+    }
+    if (key == sk_app::Window::Key::kUp && modifiers == 0) 
+	{
+        curpos.y--;
+        curpos.y = std::max(0, curpos.y);
+        std::wstring* ptext = GetLineText(curpos.y);
+        curpos.x = FindSuitX(*ptext, nLastX);
+    }
+    if (key == sk_app::Window::Key::kLeft && modifiers == 0) 
+	{
+        //	std::wstring *ptext = GetLineText(curpos.y);
+        if (curpos.x == 0 && curpos.y == 0) return;
+        if (curpos.x == 0 /*&& curpos.y>0*/) 
+		{
+            curpos.y--;
+            std::wstring* ptext = GetLineText(curpos.y);
+            curpos.x = ptext->size();
+        }
+		else 
+		{
+            curpos.x--;
+        }
+        SetLastX();
+    }
+
+    if (key == sk_app::Window::Key::kRight && modifiers == 0) 
+	{
+        std::wstring* ptext = GetLineText(curpos.y);
+        if (curpos.x >= ptext->size() && curpos.y < line.size() - 1) 
+		{
+            curpos.y++;
+            curpos.x = 0;
+            // curpos.y = std::min((int)line.size() - 1, curpos.y);
+        } 
+		else 
+		{
+            curpos.x++;
+            curpos.x = std::min(curpos.x, (int)ptext->size());
+        }
+        SetLastX();
     }
 }
 #include <codecvt>  // std::codecvt_utf8
@@ -201,57 +244,90 @@ std::wstring* TextField::GetLineText(int nLine) {
     return &line[nLine].line_text;
 }
 
-void TextField::OnChar(SkUnichar c, uint32_t modifiers) {
+void TextField::OnChar(SkUnichar c, uint32_t modifiers)
+{
     /*CANDIDATEFORM exclude_rectangle = {0, CFS_EXCLUDE, {500, 500},
       {200, 100,500,200}};
         ImmSetCandidateWindow(imm_context, &exclude_rectangle);*/
 
-    /*printf("insert key=%d,modifiers=%d\n",c,modifiers);
-    TextDesc desc;
-    desc.text=c;
-    desc.color=text_color;
-    textlist.push_back(desc);*/
-
-    // printf(" key=%d,modifier=%d,len=%d\n",c,modifiers,textlist.length());
+   
 
     std::wstring* ptext = GetLineText(curpos.y);
-
-    if (c == 0x08) {
-        if (ptext->length() == 0) {
-            if (curpos.y >= 1) {
-                line.erase(line.begin() + curpos.y);
+    printf("cur line=%d,text=%s\n", curpos.y, wstring2string(*ptext, "chinese").c_str());
+    if (c == 0x08) 
+	{
+        if (ptext->length() == 0 || curpos.x == 0) 
+		{
+            if (curpos.y >= 1) 
+			{
                 curpos.y--;
                 curpos.x = GetLineText(curpos.y)->size();
+                GetLineText(curpos.y)->insert(curpos.x, ptext->c_str(), ptext->size());
+                line.erase(line.begin() + curpos.y + 1);
             }
             return;
         }
-        if (ptext->length() >= 1) ptext->pop_back();
+        if (ptext->length() >= 1) 
+		{
+            // ptext->pop_back();
+            ptext->erase(curpos.x - 1, 1);
+        }
 
         curpos.x--;
         return;
     }
 
-    if (c == 0x0d) {
-        curpos.y += 1;
+    if (c == 0x0d) 
+	{
+        if (curpos.x < ptext->size()) 
+		{
+            TextLine info;
+            info.nHeight = 20;
+            info.line_text = ptext->substr(curpos.x, ptext->size() - curpos.x);
+            // line.push_back(info);
+
+            ptext->resize(curpos.x);
+            curpos.y += 1;
+            curpos.x = 0;
+
+            line.insert(line.begin() + curpos.y, info);
+        } 
+		else 
+		{
+            TextLine info;
+            info.nHeight = 20;
+            line.push_back(info);
+            curpos.y += 1;
+            curpos.x = 0;
+        }
+        /*curpos.y += 1;
         curpos.x = 0;
 
         TextLine info;
         info.nHeight = 20;
-        line.push_back(info);
+        line.push_back(info);*/
         return;
     }
-    if (c > 0x80) {
+    if (c > 0x80) 
+	{
         unchar[unindex] = (char)c;
         unindex++;
 
-        if (unindex == 2) {
+        if (unindex == 2) 
+		{
             std::wstring wtxt = string2wstring(unchar, "Chinese");
-            ptext->push_back(wtxt[0]);
+            // ptext->push_back(wtxt[0]);
+            ptext->insert(curpos.x, &wtxt[0], 1);
             curpos.x++;
         }
         unindex = unindex % 2;
-    } else {
-        ptext->push_back(c);
+    } 
+	else 
+	{
+        wchar_t inc = c;
+        ptext->insert(curpos.x, &inc, 1);
+
+        // ptext->push_back(c);
         curpos.x++;
     }
 }

@@ -39,6 +39,9 @@ public:
 
     void DrawCurPosBlink(SkCanvas* canvas);
 
+    int FindSuitX(std::wstring text, int nCmpX);
+    void SetLastX();
+
     SkPoint ScrollViewToChildPoint(int x, int y) {
         SkPoint point;
         point.set(x - GetBound().left(), y - GetBound().top());
@@ -49,13 +52,12 @@ private:
     // std::deque<TextDesc> textlist;
 
     SkColor text_color;
-    // long long llCursorPos;
-
-    // std::deque<std::wstring>
 
     std::deque<TextLine> line;
     // std::wstring textlist;
     TextPoint curpos;
+
+    int nLastX;
     char unchar[2];
     int unindex;
 
