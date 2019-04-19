@@ -24,9 +24,16 @@ void Animation::StartAction()
 }
 void Animation::StopAction()
 {
+	/*int a;
+	a = 5;
+	for (int k = 0; k < splist.size(); k++)
+		delete splist[k];
+	splist.clear();*/
+
 }
 void Animation::ShowSprite(int nIndex)
 {
+	/*printf("show index=%d\n", nIndex);*/
 	for (int k = 0; k < splist.size(); k++)
 	{
 		splist[k]->SetPosition(GetWidget()->GetBound().left(), GetWidget()->GetBound().top());
@@ -42,9 +49,11 @@ void Animation::update()
 		return;
 	if (SkTime::GetMSecs() - fLastStamp >= fDelayPerUnit*1000)
 	{
-		ShowSprite(nShowIndex);
 		nShowIndex++;
 		nShowIndex = nShowIndex % splist.size();
+		ShowSprite(nShowIndex);
+		
+	
 		fLastStamp = SkTime::GetMSecs();
 	}
 }
