@@ -7,6 +7,11 @@ TextField::TextField()
 {
     SetBackGroundColor(SkColorSetRGB(230, 230, 230));
     text_color = SkColorSetRGB(0, 0, 0);
+	memset(&ContentInfo, 0x00, sizeof(ContentInfo));
+	vert_bar = new ScrollBar(Direction::Vertical);
+    hori_bar = new ScrollBar(Direction::Horizontal);
+    vert_bar->set_controller(this);
+    hori_bar->set_controller(this);
 
     //imm_context = ::ImmGetContext(hwnd);
     //CANDIDATEFORM exclude_rectangle = {0, CFS_EXCLUDE, {500, 500}, {200, 100, 500, 200}};
@@ -15,6 +20,7 @@ TextField::TextField()
     TextLine info;
     info.nHeight = 20;
     line.push_back(info);
+	SetContentSize(GetWidth(), line.size() * 20);
     fCurPosBlinkTime = SkTime::GetMSecs();
 }
 TextField::~TextField() 
@@ -26,6 +32,11 @@ TextField::~TextField()
 #include "SkTextBlob.h"
 void TextField::Draw(SkCanvas* canvas) 
 {
+	ContentInfo.offs_y = GetScrolloffsY();
+	SkScalar diff_y = ContentInfo.offs_y - ContentInfo.preoffs_y;
+	ContentInfo.offs_x = GetScrolloffsX();
+	SkScalar diff_x = ContentInfo.offs_x - ContentInfo.preoffs_x;
+
     GrContext* context = canvas->getGrContext();
     SkImageInfo info = SkImageInfo::MakeN32(GetWidth(), GetHeight(), kOpaque_SkAlphaType);
     auto gpuSurface(SkSurface::MakeRenderTarget(context, SkBudgeted::kNo, info));
@@ -33,12 +44,29 @@ void TextField::Draw(SkCanvas* canvas)
     SkPaint paint;
     paint.setColor(GetBackGroundColor());
     surfaceCanvas->drawRect(SkRect{0, 0, GetWidth(), GetHeight()}, paint);
-    SkScalar ins_x = 0;
-    SkScalar ins_y = 20;
+  /*  SkScalar ins_x = 0;
+    SkScalar ins_y = 20;*/
     SkFont font;
     font.setSubpixel(true);
     font.setSize(16);
 
+
+	int nIndex = (-ContentInfo.offs_y) / 20;
+
+	int ins_y = 20;
+	int ins_x = 0;
+	for (int k = nIndex; k < line.size(); k++)
+	{
+		paint.setColor(SkColorSetRGB(0, 0, 0));
+		std::wstring* ptext = GetLineText(k);
+		surfaceCanvas->drawSimpleText(ptext->c_str(), ptext->size() * 2, kUTF16_SkTextEncoding, ins_x, ins_y, font, paint);
+		ins_y += line[k].nHeight;
+		if (ins_y > GetDisplayHeigth())
+			break;
+	}
+
+	/*int ins_y = 20;
+	int ins_x = 0;
     for (int k = 0; k < line.size(); k++) 
 	{
         paint.setColor(SkColorSetRGB(0, 0, 0));
@@ -46,7 +74,7 @@ void TextField::Draw(SkCanvas* canvas)
         std::wstring* ptext = GetLineText(k);
         surfaceCanvas->drawSimpleText(ptext->c_str(), ptext->size() * 2, kUTF16_SkTextEncoding,ins_x, ins_y, font, paint);
         ins_y += line[k].nHeight;
-    }
+    }*/
 
     DrawCurPosBlink(surfaceCanvas);
     /*Sequence sq = Sequence(0, [&]() {
@@ -57,6 +85,12 @@ void TextField::Draw(SkCanvas* canvas)
     paint.setColor(GetBackGroundColor());
     sk_sp<SkImage> image(gpuSurface->makeImageSnapshot());
     canvas->drawImage(image, GetBound().left(), GetBound().top());
+
+	UpdateScrollBarInfo();
+	if (vert_bar != NULL)
+		vert_bar->Draw(canvas);
+	if (hori_bar != NULL)
+		hori_bar->Draw(canvas);
 }
 
 void TextField::DrawCurPosBlink(SkCanvas* canvas) 
@@ -67,7 +101,7 @@ void TextField::DrawCurPosBlink(SkCanvas* canvas)
     {
         fCurPosBlinkTime = SkTime::GetMSecs();
         SkScalar x, y;
-        y = curpos.y * 20;
+		y = curpos.y * 20 + GetScrolloffsY();
         std::wstring* ptext = GetLineText(curpos.y);
         SkPaint paint;
         SkFont font;
@@ -85,9 +119,7 @@ void TextField::DrawCurPosBlink(SkCanvas* canvas)
     }
 }
 
-void TextField::OnMouseMove(int x, int y) 
-{
-}
+
 
 int TextField::FindSuitX(std::wstring text, int nCmpX) 
 {
@@ -119,12 +151,35 @@ void TextField::SetLastX()
     nLastX = bounds.width();
 }
 
+void TextField::OnMouseMove(int x, int y) 
+{
+    if (vert_bar != NULL && vert_bar->IsVisible())
+		vert_bar->OnMouseMove(x, y);
+    if (hori_bar != NULL && hori_bar->IsVisible()) 
+		hori_bar->OnMouseMove(x, y);
+}
+
 void TextField::OnMouseDown(int x, int y) 
 {
+
+	if (vert_bar != NULL && vert_bar->IsVisible())
+	{
+        if (x >= vert_bar->GetBound().left() && x <= vert_bar->GetBound().right() && y >= vert_bar->GetBound().top() && y <= vert_bar->GetBound().bottom())
+            return vert_bar->OnMouseDown(x, y);
+    }
+
+    if (hori_bar != NULL && hori_bar->IsVisible())
+	{
+        if (x >= hori_bar->GetBound().left() && x <= hori_bar->GetBound().right() && y >= hori_bar->GetBound().top() && y <= hori_bar->GetBound().bottom())
+            return hori_bar->OnMouseDown(x, y);
+    }
+
     SkPoint point = ScrollViewToChildPoint(x, y);
 
     if (point.y() > line.size() * 20) return;
-    int nIndex = point.y() / 20;
+
+	int nYIndex = (-GetScrolloffsY()) / 20;
+    int nIndex = point.y() / 20+ nYIndex;
 
     std::wstring* ptext = GetLineText(nIndex);
     SkPaint paint;
@@ -143,17 +198,28 @@ void TextField::OnMouseDown(int x, int y)
         }
     }
     curpos.x = k;
-    curpos.y = nIndex;
+	curpos.y = nIndex;
 
     nLastX = point.x();
 }
 
 void TextField::OnMouseUp(int x, int y) 
 {
+    if (vert_bar != NULL && vert_bar->IsVisible())
+	{
+        vert_bar->OnMouseUp(x, y);
+    }
+    if (hori_bar != NULL && hori_bar->IsVisible()) 
+	{
+        hori_bar->OnMouseUp(x, y);
+    }
 }
 
 void TextField::OnMouseWheel(float delta, uint32_t modifier) 
 {
+    if (vert_bar == NULL || !vert_bar->IsVisible()) 
+		return;
+    ScrollToPosition(vert_bar, GetScrolloffsY() + delta * 20);
 }
 
 void TextField::OnKey(sk_app::Window::Key key, uint32_t modifiers) 
@@ -207,42 +273,7 @@ void TextField::OnKey(sk_app::Window::Key key, uint32_t modifiers)
         SetLastX();
     }
 }
-#include <codecvt>  // std::codecvt_utf8
-#include <cstdint>  // std::uint_least32_t
-#include <locale>   // std::wstring_convert
-#include <string>   // std::string, std::u32string
 
-std::string wstring2utf8string(const std::wstring& str) {
-    static std::wstring_convert<std::codecvt_utf8<wchar_t> > strCnv;
-    return strCnv.to_bytes(str);
-}
-
-std::string wstring2utf16string(const std::wstring& str) {
-    static std::wstring_convert<std::codecvt_utf16<wchar_t> > strCnv;
-    return strCnv.to_bytes(str);
-}
-
-std::wstring utf8string2wstring(const std::string& str) {
-    static std::wstring_convert<std::codecvt_utf8<wchar_t> > strCnv;
-    return strCnv.from_bytes(str);
-}
-
-std::string wstring2string(const std::wstring& str, const std::string& locale) {
-    typedef std::codecvt_byname<wchar_t, char, std::mbstate_t> F;
-    static std::wstring_convert<F> strCnv(new F(locale));
-    return strCnv.to_bytes(str);
-}
-
-std::wstring string2wstring(const std::string& str, const std::string& locale) {
-    typedef std::codecvt_byname<wchar_t, char, std::mbstate_t> F;
-    static std::wstring_convert<F> strCnv(new F(locale));
-    return strCnv.from_bytes(str);
-}
-
-std::wstring* TextField::GetLineText(int nLine) {
-    if (nLine > line.size()) return 0;
-    return &line[nLine].line_text;
-}
 
 void TextField::OnChar(SkUnichar c, uint32_t modifiers)
 {
@@ -254,7 +285,7 @@ void TextField::OnChar(SkUnichar c, uint32_t modifiers)
 
     std::wstring* ptext = GetLineText(curpos.y);
     printf("cur line=%d,text=%s\n", curpos.y, wstring2string(*ptext, "chinese").c_str());
-    if (c == 0x08) 
+    if (c == 0x08) //delete
 	{
         if (ptext->length() == 0 || curpos.x == 0) 
 		{
@@ -265,15 +296,18 @@ void TextField::OnChar(SkUnichar c, uint32_t modifiers)
                 GetLineText(curpos.y)->insert(curpos.x, ptext->c_str(), ptext->size());
                 line.erase(line.begin() + curpos.y + 1);
             }
+			SetContentSize(GetWidth()-10, line.size() * 20);
             return;
         }
         if (ptext->length() >= 1) 
 		{
             // ptext->pop_back();
             ptext->erase(curpos.x - 1, 1);
+			SetContentSize(GetWidth()-10, line.size() * 20);
         }
 
         curpos.x--;
+		
         return;
     }
 
@@ -300,12 +334,7 @@ void TextField::OnChar(SkUnichar c, uint32_t modifiers)
             curpos.y += 1;
             curpos.x = 0;
         }
-        /*curpos.y += 1;
-        curpos.x = 0;
-
-        TextLine info;
-        info.nHeight = 20;
-        line.push_back(info);*/
+		SetContentSize(GetWidth()-10, line.size() * 20);
         return;
     }
     if (c > 0x80) 
@@ -326,8 +355,113 @@ void TextField::OnChar(SkUnichar c, uint32_t modifiers)
 	{
         wchar_t inc = c;
         ptext->insert(curpos.x, &inc, 1);
-
-        // ptext->push_back(c);
         curpos.x++;
     }
+}
+
+
+SkScalar TextField::GetDisplayWidth()
+{
+	SkScalar width = GetBound().width();
+	if (ContentInfo.height > GetBound().height() && vert_bar->IsVisible())
+		width -= vert_bar->GetWidth();
+	return width;
+}
+SkScalar TextField::GetDisplayHeigth()
+{
+	SkScalar heigth = GetBound().height();
+	if (ContentInfo.width > GetBound().width() && hori_bar->IsVisible())
+		heigth -= hori_bar->GetHeight();
+	return heigth;
+}
+
+void TextField::SetContentSize(SkScalar width, SkScalar height)
+{
+	ContentInfo.height = height;
+	ContentInfo.width = width;
+	UpdateScrollBarInfo();
+}
+
+
+void TextField::UpdateScrollBarInfo()
+{
+	if (ContentInfo.height > GetDisplayHeigth())
+	{
+		if (vert_bar->GetWidth() == 0)
+		{
+			vert_bar->SetPosition(GetBound().width() - BAR_VER_WIDTH + GetBound().left(), GetBound().top());
+			vert_bar->SetSize(BAR_VER_WIDTH, GetDisplayHeigth());
+		}
+		else
+		{
+			vert_bar->SetPosition(GetBound().width() - vert_bar->GetBound().width() + GetBound().left(), GetBound().top());
+			vert_bar->SetSize(vert_bar->GetBound().width(), GetDisplayHeigth());
+		}
+
+		ScrollBarInfo barinfo;
+		barinfo.ContentSize = ContentInfo.height;
+		barinfo.DisplaySize = vert_bar->GetHeight();
+		barinfo.offset = ContentInfo.offs_y;
+		SkScalar ContentMoveMax = barinfo.ContentSize - barinfo.DisplaySize;
+		barinfo.offset = std::max(barinfo.offset, -ContentMoveMax);
+		SetScrolloffsY(barinfo.offset);
+		vert_bar->SetScrollBarInfo(barinfo);
+	}
+	else
+	{
+		vert_bar->SetBound(0, 0, 0, 0);
+		SetScrolloffsY(0);
+	}
+
+	if (ContentInfo.width > GetDisplayWidth())
+	{
+		if (hori_bar->GetWidth() == 0)
+		{
+			hori_bar->SetPosition(GetBound().left(), GetBound().bottom() - BAR_HORI_HEIGHT);
+			hori_bar->SetSize(GetDisplayWidth(), BAR_HORI_HEIGHT);
+		}
+		else
+		{
+			hori_bar->SetPosition(GetBound().left(), GetBound().bottom() - hori_bar->GetBound().height());
+			hori_bar->SetSize(GetDisplayWidth(), hori_bar->GetBound().height());
+		}
+		ScrollBarInfo barinfo;
+		barinfo.ContentSize = ContentInfo.width;
+		barinfo.DisplaySize = hori_bar->GetWidth();
+		barinfo.offset = ContentInfo.offs_x;
+
+		SkScalar ContentMoveMax = barinfo.ContentSize - barinfo.DisplaySize;
+		barinfo.offset = std::max(barinfo.offset, -ContentMoveMax);
+		SetScrolloffsX(barinfo.offset);
+		hori_bar->SetScrollBarInfo(barinfo);
+	}
+	else
+	{
+		hori_bar->SetBound(0, 0, 0, 0);
+		SetScrolloffsX(0);
+	}
+}
+
+void TextField::ScrollToPosition(ScrollBar* source, int position)
+{
+	if (source == NULL)
+		return;
+	if (source == vert_bar)
+	{
+		SkScalar pos_y = position;
+		//printf("scroll before pos=%f\n",pos_y);
+		pos_y = std::min((float)0, (float)pos_y);
+		pos_y = std::max((float)(-(ContentInfo.height - GetDisplayHeigth())), (float)pos_y);
+		//	printf("scroll pos=%f\n",pos_y);
+		SetScrolloffsY(pos_y);
+
+	}
+
+	if (source == hori_bar)
+	{
+		SkScalar pos_x = position;
+		pos_x = std::min((float)0, (float)pos_x);
+		pos_x = std::max((float)(-(ContentInfo.width - GetDisplayWidth())), (float)pos_x);
+		SetScrolloffsX(pos_x);
+	}
 }
