@@ -2,6 +2,69 @@
 #include "UIWidget.h"
 
 #include "UIRoot.h"
+
+#include "Sprite.h"
+
+
+Animation::Animation()
+{
+	SetRunTime(1.0f);
+	nLoopsCount = 1;
+	nShowIndex = 0;
+	fDelayPerUnit = 0.1;
+}
+Animation::~Animation()
+{
+}
+void Animation::StartAction()
+{
+	fLastStamp = SkTime::GetMSecs();
+	SetRunTime(splist.size()*fDelayPerUnit*nLoopsCount);
+	ShowSprite(nShowIndex);
+}
+void Animation::StopAction()
+{
+}
+void Animation::ShowSprite(int nIndex)
+{
+	for (int k = 0; k < splist.size(); k++)
+	{
+		splist[k]->SetPosition(GetWidget()->GetBound().left(), GetWidget()->GetBound().top());
+		if (k == nIndex)
+			splist[k]->SetVisible(true);
+		else
+			splist[k]->SetVisible(false);
+	}
+}
+void Animation::update()
+{
+	if (ActionIsStart() == false)
+		return;
+	if (SkTime::GetMSecs() - fLastStamp >= fDelayPerUnit*1000)
+	{
+		ShowSprite(nShowIndex);
+		nShowIndex++;
+		nShowIndex = nShowIndex % splist.size();
+		fLastStamp = SkTime::GetMSecs();
+	}
+}
+
+void Animation::SetDelayPerUnit(double ft)
+{
+	fDelayPerUnit = ft;
+}
+void Animation::AddSprite(Sprite *sp)
+{
+	splist.push_back(sp);
+	sp->SetVisible(false);
+}
+void Animation::SetLoops(int nLoops)
+{
+	nLoopsCount = nLoops;
+	if (nLoops == -1)
+		nLoopsCount = 10000000;
+	SetRunTime(splist.size()*fDelayPerUnit*nLoopsCount);
+}
 Blink::Blink(double runtime, int nBlink)
 {
 	nBlinkTick=nBlink;

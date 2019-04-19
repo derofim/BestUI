@@ -194,3 +194,26 @@ public:
 private:
 	ActCallBackFun fun;
 };
+
+class Sprite;
+class Animation :public Action 
+{
+public:
+	Animation();
+	~Animation();
+	virtual Animation *clone() { return  new Animation(*this); }
+	void update() override;
+	void StopAction() override;
+	void StartAction() override ;
+
+	void SetDelayPerUnit(double ft);
+	void AddSprite(Sprite *sp);
+	void SetLoops(int nLoops);
+	void ShowSprite(int nIndex);
+private:
+	std::vector<Sprite *> splist;
+	int nLoopsCount;
+	double fDelayPerUnit;
+	double fLastStamp;
+	int nShowIndex;
+};
