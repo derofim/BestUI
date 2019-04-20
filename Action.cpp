@@ -74,6 +74,85 @@ void Animation::SetLoops(int nLoops)
 		nLoopsCount = 10000000;
 	SetRunTime(splist.size()*fDelayPerUnit*nLoopsCount);
 }
+
+
+
+
+BezierTo::BezierTo(double runtime, BezierConfig con)
+{
+	SetRunTime(runtime);
+	memcpy(&config, &con, sizeof(BezierConfig));
+}
+
+Point2D BezierTo::PointOnCubicBezier(Point2D* cp, float t)
+{
+	float   ax, bx, cx;
+	float   ay, by, cy;
+	float   tSquared, tCubed;
+	Point2D result;
+
+	cx = 3.0 * (cp[1].x - cp[0].x);
+	bx = 3.0 * (cp[2].x - cp[1].x) - cx;
+	ax = cp[3].x - cp[0].x - cx - bx;
+
+	cy = 3.0 * (cp[1].y - cp[0].y);
+	by = 3.0 * (cp[2].y - cp[1].y) - cy;
+	ay = cp[3].y - cp[0].y - cy - by;
+
+
+	tSquared = t * t;
+	tCubed = tSquared * t;
+
+	result.x = (ax * tCubed) + (bx * tSquared) + (cx * t) + cp[0].x;
+	result.y = (ay * tCubed) + (by * tSquared) + (cy * t) + cp[0].y;
+
+	return result;
+}
+
+
+void  BezierTo::ComputeBezier(Point2D* cp, int numberOfPoints, Point2D* curve)
+{
+	float   dt;
+	int    i;
+	dt = 1.0 / (numberOfPoints - 1);
+	for (i = 0; i < numberOfPoints; i++)
+		curve[i] = PointOnCubicBezier(cp, i*dt);
+}
+
+void BezierTo::StartAction()
+{
+	pointlist =(Point2D *) malloc(config.nNumPoints * sizeof(Point2D));
+	Point2D cp[4];
+	memcpy(cp, &config, sizeof(Point2D) * 4);
+	ComputeBezier(cp, config.nNumPoints, pointlist);
+	fDelayPerUnit = GetRunTime()/config.nNumPoints;
+	fLastStamp = SkTime::GetMSecs();
+	nNodeIndex = 0;
+}
+
+void BezierTo::StopAction()
+{
+	//printf("nNodeIndex=%d", nNodeIndex);
+	GetWidget()->SetPosition(pointlist[config.nNumPoints-1].x, pointlist[config.nNumPoints - 1].y);
+	free(pointlist);
+}
+
+void BezierTo::update()
+{
+	if (ActionIsStart() == false)
+		return;
+	double curstamp = SkTime::GetMSecs();
+	if (SkTime::GetMSecs() - fLastStamp >= fDelayPerUnit)
+	{
+		nNodeIndex++;
+		nNodeIndex = nNodeIndex % config.nNumPoints;
+		
+		GetWidget()->SetPosition(pointlist[nNodeIndex].x, pointlist[nNodeIndex].y);
+	//	printf("nNodeIndex=%d,mov x=%f,y=%f\n", nNodeIndex,pointlist[nNodeIndex].x, pointlist[nNodeIndex].y);
+		fLastStamp = SkTime::GetMSecs();
+	}
+}
+
 Blink::Blink(double runtime, int nBlink)
 {
 	nBlinkTick=nBlink;

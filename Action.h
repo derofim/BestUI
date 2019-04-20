@@ -217,3 +217,37 @@ private:
 	double fLastStamp;
 	int nShowIndex;
 };
+
+typedef struct
+{
+	float x;
+	float y;
+}Point2D;
+
+struct BezierConfig
+{ 
+	Point2D pbegin;
+	Point2D p1;
+	Point2D p2;
+	Point2D pend;
+	int nNumPoints=100;
+};
+
+class BezierTo :public Action
+{
+public:
+	BezierTo(double runtime, BezierConfig con);
+	virtual BezierTo *clone() { return  new BezierTo(*this); }
+	void StartAction() override;
+	void StopAction()override;
+	void update() override;
+
+	Point2D PointOnCubicBezier(Point2D* cp, float t);
+	void ComputeBezier(Point2D* cp, int numberOfPoints, Point2D* curve);
+private:
+	BezierConfig config;
+	Point2D *pointlist;
+	double fDelayPerUnit;
+	double fLastStamp;
+	int    nNodeIndex;
+};
