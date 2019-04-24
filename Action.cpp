@@ -15,6 +15,9 @@ Animation::Animation()
 }
 Animation::~Animation()
 {
+	for (int k = 0; k < splist.size(); k++)
+		delete splist[k];
+	splist.clear();
 }
 void Animation::StartAction()
 {
@@ -24,9 +27,9 @@ void Animation::StartAction()
 }
 void Animation::StopAction()
 {
-	/*int a;
+	int a;
 	a = 5;
-	for (int k = 0; k < splist.size(); k++)
+	/*for (int k = 0; k < splist.size(); k++)
 		delete splist[k];
 	splist.clear();*/
 

@@ -11,9 +11,6 @@
 #include "GameTimer.h"
 #include "sk_app/Window.h"
 class Action;
-
-extern  ActionManage *gActionManage;
-
 class UIWidget;
 
 
@@ -63,7 +60,10 @@ private:
 class UIWidget :public UIShard{
 public:
 	UIWidget();
-	virtual ~UIWidget() {};
+	virtual ~UIWidget() 
+	{ 
+		RemoveWidget(this); 
+	};
 	int nShowOrder;
 	virtual void Draw(SkCanvas* canvas)=0;
 	void SetPosition(SkScalar x, SkScalar y);

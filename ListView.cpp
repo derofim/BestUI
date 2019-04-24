@@ -34,7 +34,6 @@ ListView::~ListView()
 		delete hori_bar;
 	if(header!=NULL)
 		delete header;
-	RemoveWidget(this);
 }
 
 void ListView::AddCol(ColumnInfo info)

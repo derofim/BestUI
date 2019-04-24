@@ -4,8 +4,7 @@
 #include "GrContext.h"
 #include "ScrollView.h"
 #include "SkCanvas.h"
-#include "UIWidget.h"
-#include "ScrollView.h"
+
 struct TextDesc {
     SkColor color;
     SkUnichar text;

@@ -22,7 +22,7 @@ public:
 		Stop
 	};
 	Action();
-
+	virtual ~Action() {};
 	virtual Action *clone() { return 0; }
 	//void SetStopActionCallBack();
 	virtual void StartAction() {};
@@ -230,7 +230,7 @@ struct BezierConfig
 	Point2D p1;
 	Point2D p2;
 	Point2D pend;
-	int nNumPoints=100;
+	int nNumPoints=50;
 };
 
 class BezierTo :public Action

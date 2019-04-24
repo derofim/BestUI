@@ -1,5 +1,5 @@
 #include "ScrollView.h"
-#include "windows.h"
+//#include "windows.h"
 ScrollView::ScrollView()
 {
 	SetPosition(0, 0);
@@ -196,7 +196,7 @@ void ScrollView::OnMouseMove(int x, int y)
 
 void  ScrollView::OnMouseDown(int x, int y)
 {
-	if (vert_bar != NULL)
+    if (vert_bar != NULL && vert_bar->IsVisible())
 	{
 		if (x >= vert_bar->GetBound().left() && x <= vert_bar->GetBound().right() && y >= vert_bar->GetBound().top() && y <= vert_bar->GetBound().bottom())
 		  return  vert_bar->OnMouseDown(x, y);
